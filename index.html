@@ -110,6 +110,33 @@
   }
   .save-note.show{opacity:1;}
 
+  /* Gate screen */
+  #gate{
+    position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
+    background: radial-gradient(ellipse at 20% -10%, #2a3560 0%, var(--bg) 45%, var(--bg-deep) 100%);
+    padding:20px;
+  }
+  #gate.hidden{display:none;}
+  .gate-box{max-width:380px;width:100%;text-align:center;}
+  .gate-box h1{font-size:30px;}
+  .gate-box p{color:var(--text-dim);font-size:14px;line-height:1.6;margin-bottom:22px;}
+  .gate-input{
+    width:100%;background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+    color:var(--text);font-family:var(--sans);font-size:15px;padding:12px 14px;text-align:center;
+    letter-spacing:.05em;margin-bottom:12px;text-transform:uppercase;
+  }
+  .gate-input:focus{outline:none;border-color:var(--gold);}
+  .gate-btn{
+    width:100%;background:var(--gold);color:#1a1200;border:none;border-radius:8px;
+    padding:12px 14px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--sans);
+  }
+  .gate-btn:hover{background:var(--gold-soft);}
+  .gate-error{color:var(--rose);font-size:12.5px;margin-top:10px;min-height:16px;}
+  .gate-loading{color:var(--text-dim);font-size:13px;}
+  .gate-switch{color:var(--text-dim);font-size:12px;margin-top:8px;}
+  #app-content{display:none;}
+  #app-content.visible{display:block;}
+
   @media (max-width:520px){
     h1{font-size:30px;}
     .wrap{padding:20px 14px 70px;}
@@ -118,7 +145,19 @@
 </head>
 <body>
 <div id="stars"></div>
-<div class="wrap">
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="kicker" style="margin-bottom:14px;">Édition longue distance</div>
+    <h1>Malgré la distance</h1>
+    <p>Entrez le code reçu par email après votre achat pour accéder à votre espace de couple, privé et partagé entre vous deux.</p>
+    <input type="text" id="gateInput" class="gate-input" placeholder="VOTRE CODE" autocomplete="off">
+    <button class="gate-btn" onclick="submitCode()">Accéder à notre espace</button>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
+
+<div class="wrap" id="app-content">
   <header class="hero">
     <svg class="constellation" viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
       <line x1="30" y1="45" x2="190" y2="25" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3,4" opacity="0.6"/>
@@ -144,7 +183,23 @@
 </div>
 <div class="save-note" id="saveNote">Enregistré ✓</div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDeUetg4Wg6x91ptRQEcWQaqWWVRSSDBAI",
+  authDomain: "mafcreation-love.firebaseapp.com",
+  projectId: "mafcreation-love",
+  storageBucket: "mafcreation-love.firebasestorage.app",
+  messagingSenderId: "417742804919",
+  appId: "1:417742804919:web:2747e94b23d6a124bbfa32"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+let coupleCode = null;
+
 const SECTIONS = [
   {num:1,title:"Rituels quotidiens",intro:"Ce sont les petits gestes répétés qui, jour après jour, tissent le fil invisible qui vous relie. Simples, mais essentiels.",
    acts:[
@@ -346,27 +401,65 @@ function checkIcon(){
   return `<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1a1200" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
-async function loadState(){
-  try{
-    const res = await window.storage.list('', true);
-    if(res && res.keys){
-      for(const k of res.keys){
-        try{
-          const r = await window.storage.get(k, true);
-          if(r) state[k] = JSON.parse(r.value);
-        }catch(e){}
-      }
-    }
-  }catch(e){ console.log('no existing state'); }
-  render();
+function normalizeCode(raw){
+  return raw.trim().toUpperCase().replace(/\s+/g,'');
 }
 
-async function saveKey(key, value){
-  state[key] = value;
+async function submitCode(){
+  const input = document.getElementById('gateInput');
+  const errorEl = document.getElementById('gateError');
+  const code = normalizeCode(input.value || '');
+  if(!code){
+    errorEl.textContent = "Merci d'entrer votre code.";
+    return;
+  }
+  errorEl.textContent = '';
+  errorEl.className = 'gate-loading';
+  errorEl.textContent = 'Chargement de votre espace...';
   try{
-    await window.storage.set(key, JSON.stringify(value), true);
-    flashSaved();
-  }catch(e){ console.error('save failed', e); }
+    coupleCode = code;
+    const ref = doc(db, 'couples', coupleCode);
+    const snap = await getDoc(ref);
+    if(snap.exists()){
+      state = snap.data().state || {};
+    } else {
+      state = {};
+      await setDoc(ref, {state: {}, createdAt: Date.now()});
+    }
+    localStorage.setItem('couple_code', coupleCode);
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('app-content').classList.add('visible');
+    updateProgress();
+    render();
+  }catch(e){
+    console.error(e);
+    errorEl.className = 'gate-error';
+    errorEl.textContent = "Une erreur est survenue. Vérifiez votre connexion et réessayez.";
+  }
+}
+window.submitCode = submitCode;
+
+async function loadState(){
+  const saved = localStorage.getItem('couple_code');
+  if(saved){
+    document.getElementById('gateInput').value = saved;
+    await submitCode();
+  }
+  // otherwise, gate stays visible waiting for user input
+}
+
+let saveTimer = null;
+function saveKey(key, value){
+  state[key] = value;
+  flashSaved();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    if(!coupleCode) return;
+    try{
+      const ref = doc(db, 'couples', coupleCode);
+      await setDoc(ref, {state, updatedAt: Date.now()}, {merge:true});
+    }catch(e){ console.error('save failed', e); }
+  }, 600);
 }
 
 function flashSaved(){
@@ -471,6 +564,10 @@ function render(){
     panels.innerHTML = html;
   }
 }
+
+window.setTab = setTab;
+window.toggleActivity = toggleActivity;
+window.updateNote = updateNote;
 
 starsBg();
 updateProgress();
