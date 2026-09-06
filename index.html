@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malgré la distance</title>
+<style>
+  :root{
+    --bg: #1a2038;
+    --bg-deep: #12172b;
+    --card: #232b4a;
+    --card-border: #333d63;
+    --gold: #e3b23c;
+    --gold-soft: #f0cf7f;
+    --rose: #e79aad;
+    --text: #f2eee3;
+    --text-dim: #a7afce;
+    --line: #38406a;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(ellipse at 20% -10%, #2a3560 0%, var(--bg) 45%, var(--bg-deep) 100%);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  .star{position:absolute;background:#fff;border-radius:50%;opacity:.5;animation:twinkle 4s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.15;}50%{opacity:.8;}}
+  @media (prefers-reduced-motion: reduce){ .star{animation:none;opacity:.35;} }
+
+  .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:28px 20px 80px;}
+
+  header.hero{text-align:center;margin-bottom:28px;}
+  .constellation{width:220px;height:70px;margin:0 auto 14px;}
+  .kicker{font-family:var(--serif);font-style:italic;color:var(--text-dim);font-size:14px;letter-spacing:.02em;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:700;font-size:38px;margin:0 0 6px;color:var(--gold-soft);}
+  .subtitle{font-family:var(--serif);font-style:italic;color:var(--text-dim);font-size:16px;margin:0;}
+
+  .progress-wrap{max-width:420px;margin:22px auto 0;}
+  .progress-label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;}
+  .progress-track{height:6px;border-radius:4px;background:var(--card-border);overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--gold));border-radius:4px;transition:width .4s ease;}
+
+  nav.tabs{display:flex;gap:8px;overflow-x:auto;padding:22px 0 6px;margin-bottom:8px;scrollbar-width:none;}
+  nav.tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto;padding:9px 16px;border-radius:999px;border:1px solid var(--card-border);
+    background:transparent;color:var(--text-dim);font-size:13.5px;cursor:pointer;white-space:nowrap;
+    font-family:var(--sans);transition:all .15s ease;
+  }
+  .tab:hover{border-color:var(--gold);color:var(--text);}
+  .tab.active{background:var(--gold);color:#1a1200;border-color:var(--gold);font-weight:600;}
+
+  section.panel{display:none;}
+  section.panel.active{display:block;animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .section-intro{font-family:var(--serif);font-style:italic;color:var(--text-dim);font-size:15px;line-height:1.6;text-align:center;max-width:560px;margin:6px auto 26px;}
+  .section-head{text-align:center;margin-bottom:4px;}
+  .section-head .num{font-size:12px;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;}
+  .section-head h2{font-family:var(--serif);font-size:26px;margin:4px 0 0;color:var(--text);}
+
+  .card{
+    background:var(--card);border:1px solid var(--card-border);border-radius:10px;
+    padding:16px 18px;margin-bottom:12px;transition:border-color .15s ease;
+  }
+  .card.done{border-color:var(--gold);}
+  .card-top{display:flex;align-items:flex-start;gap:12px;}
+  .checkbox{
+    flex:0 0 auto;width:21px;height:21px;border-radius:5px;border:1.5px solid var(--text-dim);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:2px;
+    transition:all .15s ease;background:transparent;
+  }
+  .checkbox.checked{background:var(--gold);border-color:var(--gold);}
+  .checkbox svg{width:13px;height:13px;opacity:0;transition:opacity .1s ease;}
+  .checkbox.checked svg{opacity:1;}
+  .card-body{flex:1;min-width:0;}
+  .card-title{font-weight:600;font-size:15px;color:var(--text);margin:0 0 4px;}
+  .card-title .num{color:var(--gold);font-weight:700;margin-right:6px;}
+  .card-title.done{text-decoration:line-through;color:var(--text-dim);}
+  .card-desc{font-size:13.8px;line-height:1.55;color:var(--text-dim);margin:0 0 8px;}
+  .card-tip{font-size:12.5px;font-style:italic;color:var(--rose);margin:0 0 10px;}
+  .card-tip b{font-style:normal;font-weight:600;}
+  .note-input{
+    width:100%;background:var(--bg-deep);border:1px solid var(--line);border-radius:6px;color:var(--text);
+    font-family:var(--sans);font-size:13px;padding:8px 10px;resize:vertical;min-height:34px;
+  }
+  .note-input::placeholder{color:#5c6690;}
+  .note-input:focus{outline:none;border-color:var(--gold);}
+
+  .q-theme{font-family:var(--serif);font-size:18px;color:var(--gold-soft);margin:26px 0 12px;}
+  .q-theme:first-child{margin-top:0;}
+  .q-card{margin-bottom:10px;}
+  .q-text{font-size:14px;color:var(--text);margin:0 0 8px;line-height:1.5;}
+
+  footer{text-align:center;margin-top:40px;color:var(--text-dim);font-size:12px;font-family:var(--serif);font-style:italic;}
+
+  .save-note{
+    position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+    background:var(--card);border:1px solid var(--gold);color:var(--text);
+    padding:8px 16px;border-radius:8px;font-size:12.5px;opacity:0;pointer-events:none;
+    transition:opacity .25s ease;z-index:5;
+  }
+  .save-note.show{opacity:1;}
+
+  @media (max-width:520px){
+    h1{font-size:30px;}
+    .wrap{padding:20px 14px 70px;}
+  }
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="wrap">
+  <header class="hero">
+    <svg class="constellation" viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
+      <line x1="30" y1="45" x2="190" y2="25" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3,4" opacity="0.6"/>
+      <circle cx="30" cy="45" r="5" fill="var(--rose)"/>
+      <circle cx="190" cy="25" r="5" fill="var(--gold)"/>
+      <circle cx="80" cy="38" r="1.6" fill="var(--text-dim)"/>
+      <circle cx="120" cy="33" r="1.6" fill="var(--text-dim)"/>
+      <circle cx="150" cy="29" r="1.6" fill="var(--text-dim)"/>
+    </svg>
+    <div class="kicker">Édition longue distance</div>
+    <h1>Malgré la distance</h1>
+    <p class="subtitle">101 façons de rester cœur à cœur</p>
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="prog-text">0 / 101 réalisées</span><span id="prog-pct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+  <div id="panels"></div>
+
+  <footer>Malgré la distance, vous êtes ensemble.</footer>
+</div>
+<div class="save-note" id="saveNote">Enregistré ✓</div>
+
+<script>
+const SECTIONS = [
+  {num:1,title:"Rituels quotidiens",intro:"Ce sont les petits gestes répétés qui, jour après jour, tissent le fil invisible qui vous relie. Simples, mais essentiels.",
+   acts:[
+    [1,"Le café du matin partagé","Envoyez-vous une photo de votre premier café (ou thé) de la journée.","Créez un album partagé rien que pour ces photos."],
+    [2,"Le mot de passe secret","Chaque soir, dites-vous une phrase ou un mot inventé, juste à vous deux, avant de raccrocher.","Changez-le chaque mois pour garder la magie."],
+    [3,"Le même ciel","Regardez le même lever ou coucher de soleil au même moment, même à des heures différentes.","Prenez une photo chacun et comparez-les."],
+    [4,"Le message vocal du matin","Envoyez une note vocale de 30 secondes chaque matin pour commencer la journée avec la voix de l'autre.","Gardez-les précieusement, elles seront un souvenir plus tard."],
+    [5,"La playlist du jour","Partagez ce que vous écoutez aujourd'hui, sans explication, juste pour partager un morceau de votre journée.","Créez une playlist commune qui s'allonge avec le temps."],
+    [6,"La météo du cœur","Utilisez une appli de météo commune pour connaître le temps qu'il fait chez l'autre.","Commentez la météo comme si vous étiez côte à côte."],
+    [7,"L'emoji codé","Choisissez un emoji qui, entre vous, veut dire « je pense à toi » et envoyez-le sans prévenir.","Changez-le de temps en temps pour raviver la complicité."],
+    [8,"Le selfie miroir","Prenez un selfie avec la même expression chaque jour, pendant une semaine, et comparez à la fin.","Essayez des expressions absurdes pour rire ensemble."],
+    [9,"La gratitude du jour","Partagez une chose pour laquelle vous êtes reconnaissant(e) aujourd'hui.","Notez-les toutes, elles formeront un joli résumé de votre année."],
+    [10,"Le repas partagé","Envoyez une photo de votre repas pour « manger ensemble », même à distance.","Essayez de cuisiner la même chose un soir par semaine."],
+    [11,"Le dernier mot","Créez un rituel du dernier mot avant de dormir, toujours le même, comme un signe silencieux.","Un simple « à demain, mon cœur » suffit."],
+    [12,"La pensée du jour","Envoyez une citation ou une pensée qui vous a marqué(e) aujourd'hui.","Gardez-les dans une note commune, elles vous ressembleront avec le temps."],
+    [13,"Midi ici, midi là-bas","Partagez une photo de l'endroit où vous êtes à midi.","Comparez vos environnements, même très différents."],
+    [14,"Le sticker à nous","Créez un emoji ou sticker personnalisé qui veut dire « je pense à toi ».","Utilisez une appli simple de création de stickers."],
+    [15,"Le compliment du jour","Envoyez un compliment différent chaque jour, pendant un mois entier.","Notez ceux qui vous ont le plus touché(e)."],
+    [16,"La tenue du jour","Partagez une photo de votre tenue, comme si vous vous prépariez ensemble le matin.","Amusez-vous à commenter les looks improbables."],
+    [17,"Le bonjour secret","Créez un rituel du bonjour avec toujours la même phrase, dite d'une manière particulière.","Cette phrase deviendra un symbole fort de votre relation."],
+    [18,"La note vocale chantée","Envoyez-vous une note vocale chantée, même (surtout) si vous chantez faux.","Personne ne juge ici, c'est fait pour rire et attendrir."]
+   ]},
+  {num:2,title:"Rendez-vous virtuels",intro:"La distance ne vous empêche pas d'avoir de vrais moments à deux. Ces rendez-vous recréent la présence, un écran à la fois.",
+   acts:[
+    [19,"Le dîner en visio","Commandez le même repas chacun de votre côté et dînez ensemble en appel vidéo.","Mettez la table comme pour un vrai date."],
+    [20,"Le film synchronisé","Regardez un film en même temps, avec un appel vidéo en fond pour partager vos réactions.","Comptez « 3, 2, 1 » avant de lancer, ensemble."],
+    [21,"Le jeu à deux","Jouez à un jeu de société en ligne ensemble (échecs, cartes, jeux collaboratifs).","Instaurez un petit défi ou un gage pour le/la perdant(e)."],
+    [22,"La cuisine en visio","Cuisinez la même recette en même temps, chacun dans sa cuisine, en appel vidéo.","Goûtez en même temps et comparez vos versions."],
+    [23,"Le café virtuel du dimanche","Instaurez un rendez-vous café en visio, chaque dimanche matin, sans écran de téléphone entre vous.","Faites-en un rituel sacré, difficile à annuler."],
+    [24,"Le quiz du couple","Organisez un quiz en visio pour voir qui connaît le mieux l'autre.","Préparez des questions à l'avance pour surprendre l'autre."],
+    [25,"Le sport en duo","Faites une séance de sport ensemble en visio, yoga, étirements ou cardio.","Choisissez une vidéo à suivre à deux."],
+    [26,"Le coucher de soleil à deux","Observez un coucher de soleil ensemble via un appel vidéo, en silence si besoin.","Prenez une photo de l'écran comme souvenir."],
+    [27,"Le musée virtuel","Faites la visite virtuelle d'un musée célèbre ensemble, commentaires inclus.","Beaucoup de grands musées offrent des visites virtuelles gratuites."],
+    [28,"Le karaoké à distance","Organisez une soirée karaoké en visio, sans se soucier du ridicule.","Choisissez chacun une chanson pour l'autre."],
+    [29,"Dessine-moi","En visio, dessinez chacun un portrait de l'autre en quelques minutes.","Échangez vos œuvres en photo, gardez-les précieusement."],
+    [30,"La série en simultané","Regardez un épisode de série « en même temps », chacun chez soi.","Interdiction d'avancer sans l'autre !"],
+    [31,"Le pique-nique synchronisé","Préparez un petit pique-nique chacun de votre côté et partagez-le en appel vidéo.","Choisissez le même menu pour jouer le jeu à fond."],
+    [32,"Le jeu vidéo coopératif","Jouez ensemble à un jeu vidéo en ligne, coopératif de préférence.","Un jeu simple suffit, l'important est le temps partagé."],
+    [33,"La dégustation à distance","Envoyez-vous à l'avance le même vin, thé ou chocolat, et dégustez-le ensemble en visio.","Notez vos impressions et comparez vos avis."],
+    [34,"La soirée déguisée","Organisez une soirée déguisée en visio, juste pour le plaisir de rire ensemble.","Improvisez avec ce que vous avez sous la main."],
+    [35,"Le silence complice","Restez en appel vidéo sans parler, juste pour être présents l'un pour l'autre.","Essayez pendant vos activités du soir, comme si vous étiez côte à côte."],
+    [36,"Les étoiles ensemble","Observez les étoiles chacun de votre côté, en appel vidéo.","Cherchez la même constellation en même temps."],
+    [37,"La visite du quotidien","Faites un tour de votre maison ou quartier en visio pour « vivre » le quotidien de l'autre.","Montrez les petits détails que vous ne décrivez jamais."],
+    [38,"Le petit-déjeuner au lit synchronisé","Prenez votre petit-déjeuner au lit ensemble, en appel vidéo, sans bouger de la matinée.","Prolongez avec une grasse matinée partagée à distance."]
+   ]},
+  {num:3,title:"Lettres et mots doux",intro:"L'écrit a ce pouvoir que l'instantané n'a pas : il se garde, se relit, se transmet. Ces mots deviendront des trésors.",
+   acts:[
+    [39,"La lettre des retrouvailles","Écrivez une lettre à ouvrir seulement le jour de vos prochaines retrouvailles.","Cachetez-la, l'attente rendra le moment plus fort."],
+    [40,"La capsule temporelle","Créez ensemble une série de messages à ouvrir dans un an, jour pour jour.","Ajoutez une prédiction amusante sur votre futur."],
+    [41,"Pourquoi je t'aime","Écrivez une lettre expliquant pourquoi vous aimez l'autre, à envoyer par surprise.","Soyez précis, les détails touchent plus que les généralités."],
+    [42,"Le journal à deux","Tenez un journal alterné que vous vous envoyez chaque semaine.","Posez une question à la fin de chaque entrée pour continuer l'échange."],
+    [43,"Le message d'urgence douceur","Écrivez un message à ouvrir uniquement « en cas de coup de mou ».","Remplissez-le de souvenirs qui font sourire."],
+    [44,"Les lettres numérotées","Créez une série de lettres à ouvrir « quand tu te sens seul(e) », « quand tu doutes », etc.","Cachez-les dans les affaires de l'autre avant une séparation."],
+    [45,"La carte postale physique","Envoyez une vraie carte postale, même si vous vous êtes déjà tout dit par message.","Le geste physique compte plus que le contenu."],
+    [46,"Le poème pour l'autre","Écrivez un poème ou une chanson, même maladroite, pour l'autre.","La sincérité compte plus que la rime parfaite."],
+    [47,"Le calendrier de l'avent des mots doux","Créez un calendrier avec un mot doux par jour avant vos prochaines retrouvailles.","Utilisez de petites enveloppes numérotées."],
+    [48,"La lettre du futur","Écrivez une lettre comme si vous vous parliez dans 10 ans.","Gardez-la précieusement pour la relire un jour, ensemble."],
+    [49,"Le message « au cas où »","Envoyez un message vocal « au cas où j'oublierais de te le dire aujourd'hui ».","Dites-y simplement ce que vous ressentez, sans filtre."],
+    [50,"Le carnet de petits mots","Créez un carnet de mots doux à vous échanger par courrier au fil du temps.","Ajoutez des dessins ou des collages pour le personnaliser."],
+    [51,"Les 10 souvenirs préférés","Écrivez chacun vos 10 souvenirs préférés ensemble, puis comparez vos listes.","Vous serez surpris de voir lesquels coïncident."],
+    [52,"La lettre manuscrite","Écrivez une lettre à la main plutôt que tapée, pour le geste et l'écriture.","Le temps pris pour l'écrire se ressent à la lecture."],
+    [53,"Le jeu de piste écrit","Créez un jeu de piste à distance avec des indices envoyés un à un.","Menez vers un souvenir, une photo ou une surprise finale."],
+    [54,"Le « quand »","Écrivez ce que vous aimeriez faire ensemble « quand » la distance sera terminée.","Relisez cette liste régulièrement pour garder l'espoir vivant."],
+    [55,"Ce que j'aime chez toi aujourd'hui","Envoyez un message qui commence par « ce que j'aime chez toi aujourd'hui c'est... ».","Essayez de varier chaque fois, sans vous répéter."],
+    [56,"Les mots inventés","Créez une liste de mots doux inventés, un langage secret rien qu'à vous deux.","Utilisez-les dans vos messages du quotidien."]
+   ]},
+  {num:4,title:"Cadeaux et surprises à distance",intro:"Un objet, un colis, une odeur familière : ces gestes rendent tangible ce que les mots ne suffisent pas toujours à exprimer.",
+   acts:[
+    [57,"Le colis qui sent chez soi","Envoyez un colis surprise avec des objets qui sentent votre maison.","Ajoutez un mot expliquant chaque objet."],
+    [58,"La bougie jumelle","Commandez la même bougie parfumée pour vous sentir dans le même espace en l'allumant ensemble.","Allumez-la lors de votre prochain appel vidéo."],
+    [59,"Le livre annoté","Envoyez un livre avec des passages surlignés qui vous font penser à l'autre.","Ajoutez des notes en marge, comme une conversation silencieuse."],
+    [60,"Le petit-déjeuner livré","Faites livrer un petit-déjeuner surprise chez l'autre, sans prévenir.","Coordonnez l'heure pour qu'il/elle soit bien réveillé(e)."],
+    [61,"Le vêtement parfumé","Envoyez un t-shirt ou un pull imprégné de votre parfum.","Un geste simple qui a un fort impact émotionnel."],
+    [62,"L'abonnement surprise","Créez un abonnement mensuel surprise (thé, chocolat, petits objets).","Variez le thème chaque mois pour garder l'effet de surprise."],
+    [63,"La playlist commentée","Envoyez une playlist « just for you » avec une note expliquant chaque chanson.","Prenez le temps de vraiment justifier chaque choix."],
+    [64,"Les fleurs surprises","Faites livrer des fleurs sans prévenir, un jour ordinaire.","Les meilleures surprises arrivent sans occasion particulière."],
+    [65,"L'objet souvenir","Envoyez un objet qui représente un souvenir précis entre vous.","Joignez un mot qui explique pourquoi cet objet compte."],
+    [66,"La boîte à souvenirs","Créez une boîte à souvenirs à vous envoyer à tour de rôle, qui se remplit avec le temps.","Ajoutez des tickets, photos, petits mots à chaque envoi."],
+    [67,"Le doudou parfumé","Envoyez un coussin ou un doudou qui garde l'odeur de chez vous.","Idéal pour les nuits où la distance pèse le plus."],
+    [68,"Le plat préféré livré","Faites livrer le plat préféré de l'autre, un jour ordinaire, sans occasion.","La surprise n'a pas besoin d'un événement pour être belle."],
+    [69,"La bonne nuit enregistrée","Envoyez un enregistrement de votre voix qui dit « bonne nuit », à écouter avant de dormir.","Enregistrez-en plusieurs pour varier les soirs difficiles."],
+    [70,"Le calendrier photo","Créez un calendrier avec vos photos ensemble à offrir à l'autre.","Ajoutez une date importante par mois (rencontre, premier voyage...)."],
+    [71,"Le date offert à distance","Envoyez une carte-cadeau pour « un date que je t'offre », à utiliser où il/elle veut.","Laissez l'autre choisir le lieu et l'activité."],
+    [72,"Le petit mot caché","Cachez un petit mot doux dans un objet du quotidien de l'autre.","Demandez à un proche de l'aider à le glisser discrètement."]
+   ]},
+  {num:5,title:"Préparer les retrouvailles",intro:"L'attente devient plus douce quand elle se prépare. Ces activités transforment le compte à rebours en projet commun.",
+   acts:[
+    [73,"Le compte à rebours visuel","Créez un compte à rebours visuel jusqu'à vos prochaines retrouvailles.","Affichez-le quelque part que vous voyez chaque jour."],
+    [74,"Le premier repas des retrouvailles","Planifiez ensemble ce que vous mangerez le jour de vos retrouvailles.","Choisissez un plat qui a une signification particulière pour vous deux."],
+    [75,"La liste du jour J","Écrivez la liste des choses à faire dès que vous vous retrouvez.","Gardez-en une copie chacun, pour comparer après."],
+    [76,"La playlist des retrouvailles","Créez une playlist à écouter en chemin vers vos retrouvailles.","Ajoutez des chansons qui racontent votre histoire."],
+    [77,"La surprise d'arrivée","Préparez une surprise pour l'arrivée de l'autre.","Même un petit geste peut marquer fort ce moment."],
+    [78,"Le week-end en détail","Planifiez ensemble, en détail, votre premier week-end réuni.","Laissez aussi de la place à l'improvisation."],
+    [79,"Le rituel d'accueil","Créez un rituel d'accueil, toujours le même geste ou la même phrase à l'arrivée.","Ce rituel deviendra un repère précieux au fil du temps."],
+    [80,"Les lieux à découvrir","Faites une liste des lieux à découvrir ensemble lors de la prochaine visite.","Alternez lieux touristiques et coins secrets à explorer."],
+    [81,"La lettre à lire ensemble","Préparez une lettre à lire à voix haute, ensemble, dès votre arrivée.","Écrivez-la à deux mains si possible."],
+    [82,"Le prochain voyage","Planifiez un voyage pour votre prochaine occasion de vous voir.","Même un petit budget permet une belle escapade."],
+    [83,"Le calendrier des visites","Créez un calendrier affiché des visites à venir.","Cela rend les futures retrouvailles plus concrètes."],
+    [84,"Le jour où tout change","Imaginez et écrivez à quoi ressemblera le jour où la distance prendra fin.","Relisez ce texte dans les moments de doute."],
+    [85,"La tenue spéciale","Préparez une tenue ou un look particulier pour vos retrouvailles.","Faites-en un secret jusqu'au jour J."],
+    [86,"Le menu des retrouvailles","Faites une liste de plats à cuisiner ensemble à la prochaine visite.","Prévoyez les ingrédients à l'avance pour ne pas perdre de temps."],
+    [87,"L'activité jamais faite","Planifiez une activité que vous n'avez encore jamais faite ensemble.","Sortez un peu de votre zone de confort commune."],
+    [88,"Le rituel de fin de visite","Créez un rituel pour adoucir la prochaine séparation.","Un geste simple peut rendre l'au revoir moins difficile."]
+   ]},
+  {num:6,title:"Connexion profonde",intro:"Au-delà des activités, ce sont ces conversations sincères qui nourrissent vraiment votre lien, jour après jour.",
+   acts:[
+    [89,"Les 36 questions","Posez-vous les 36 questions qui rapprochent (méthode Aron), en visio.","Prenez votre temps, ne cherchez pas à toutes les faire en une soirée."],
+    [90,"Le bilan de la distance","Parlez ouvertement de ce qui est difficile dans la distance, une fois par mois.","Faites-en un moment sans jugement, juste pour vous écouter."],
+    [91,"Notre vie dans 5 ans","Écrivez chacun votre vision de votre vie ensemble dans 5 ans, puis comparez.","Notez les points communs et discutez des différences."],
+    [92,"Le rêve le plus fou","Racontez-vous votre rêve le plus fou pour le futur de votre couple.","Ne vous censurez pas, même si cela semble irréaliste."],
+    [93,"Le bilan mensuel","Faites un bilan mensuel : ce qui va bien, ce qu'on peut améliorer.","Terminez toujours sur un point positif."],
+    [94,"La date de la fin","Discutez ouvertement de la date où la distance prendra fin, même approximative.","Avoir un horizon, même flou, aide à tenir."],
+    [95,"Ce qui te manque cette semaine","Demandez « qu'est-ce qui te manque le plus de moi cette semaine ? ».","Cette question, posée régulièrement, révèle beaucoup."],
+    [96,"La peur partagée","Partagez une peur ou une inquiétude liée à la distance, sans jugement.","Accueillez la réponse de l'autre avec douceur."],
+    [97,"Nos valeurs communes","Créez ensemble une liste de valeurs qui comptent pour votre couple.","Revenez-y quand une décision importante se présente."],
+    [98,"La gratitude du dimanche","Faites un rituel de gratitude l'un envers l'autre chaque dimanche.","Soyez précis sur ce pour quoi vous êtes reconnaissant(e)."],
+    [99,"Gérer le manque","Discutez de comment gérer le manque quand il devient trop lourd.","Trouvez ensemble un geste qui aide dans ces moments-là."],
+    [100,"Pourquoi ça vaut la peine","Rappelez-vous mutuellement pourquoi cette distance vaut la peine.","Gardez une trace écrite de cette conversation."],
+    [101,"La promesse commune","Écrivez-vous une promesse commune pour tenir jusqu'aux retrouvailles.","Signez-la tous les deux, même symboliquement."]
+   ]}
+];
+
+const QUESTIONS = [
+  ["Pour se redécouvrir",[
+    "Quel est ton souvenir préféré de nous, et pourquoi ?",
+    "Qu'est-ce que tu as appris sur toi-même depuis qu'on est ensemble ?",
+    "Quelle chanson te fait penser à moi, et depuis quand ?",
+    "Si tu devais décrire notre relation en trois mots, lesquels choisirais-tu ?",
+    "Qu'est-ce qui t'a fait tomber amoureux/amoureuse de moi, au juste ?"
+  ]],
+  ["Pour parler de la distance",[
+    "Qu'est-ce qui te manque le plus de moi en ce moment ?",
+    "Comment tu gères les moments où la distance pèse trop ?",
+    "Qu'est-ce que je pourrais faire pour te faire sentir plus proche de moi ?",
+    "Y a-t-il un moment récent où tu t'es senti(e) seul(e) et que tu ne m'as pas dit ?",
+    "Qu'est-ce qui t'aide à tenir, les jours difficiles ?"
+  ]],
+  ["Pour rêver ensemble",[
+    "À quoi ressemble notre vie quand la distance sera terminée ?",
+    "Quel est le premier voyage qu'on devrait faire ensemble ?",
+    "Où est-ce que tu nous imagines vivre, un jour ?",
+    "Quelle tradition aimerais-tu qu'on crée, tous les deux ?",
+    "Si on pouvait vivre n'importe où pendant un an, où irait-on ?"
+  ]],
+  ["Pour approfondir",[
+    "Qu'est-ce que tu attends de moi que je ne t'offre pas encore ?",
+    "Comment je peux mieux te soutenir dans les moments difficiles ?",
+    "Qu'est-ce qui te fait te sentir aimé(e) au quotidien ?",
+    "Y a-t-il quelque chose que tu n'as jamais osé me dire ?",
+    "Qu'est-ce que la distance nous a appris sur nous, en tant que couple ?"
+  ]],
+  ["Pour rire un peu",[
+    "Quelle est la chose la plus étrange que tu fais quand tu penses à moi ?",
+    "Si j'étais un emoji, lequel serais-je ?",
+    "Quel est le truc le plus mignon (ou le plus gênant) que j'ai fait sans le savoir ?",
+    "Si on avait un thème musical de couple, ce serait quoi ?",
+    "Qu'est-ce que tu ferais si je débarquais chez toi là, maintenant, par surprise ?"
+  ]],
+  ["Pour la confiance",[
+    "Qu'est-ce qui te rassure le plus quand le doute s'installe ?",
+    "Comment je peux te prouver ma fidélité même à distance ?",
+    "Y a-t-il quelque chose que je fais qui te met mal à l'aise, même involontairement ?",
+    "Qu'est-ce qui renforce ta confiance en nous, jour après jour ?",
+    "Si tu pouvais changer une chose dans notre communication, ce serait quoi ?"
+  ]],
+  ["Pour la famille et l'avenir",[
+    "Comment imagines-tu présenter notre relation à ta famille ?",
+    "Combien d'enfants aimerais-tu avoir, si tu en veux ?",
+    "Quelles traditions familiales aimerais-tu qu'on garde ensemble ?",
+    "Qu'est-ce qui compte le plus pour toi dans un futur foyer ?",
+    "Comment veux-tu qu'on célèbre nos anniversaires plus tard ?"
+  ]],
+  ["Pour l'argent et la vie pratique",[
+    "Comment vois-tu la gestion des finances dans un couple ?",
+    "Qu'est-ce qui est important pour toi dans notre futur mode de vie ?",
+    "Préfères-tu épargner pour un voyage ou pour une maison, en premier ?",
+    "Comment veux-tu qu'on organise notre quotidien une fois réunis ?",
+    "Quel est ton rêve professionnel, et comment je peux te soutenir dedans ?"
+  ]]
+];
+
+let state = {}; // key -> {checked, note}
+let activeTab = "s1";
+
+function starsBg(){
+  const el = document.getElementById('stars');
+  let html = '';
+  for(let i=0;i<60;i++){
+    const size = Math.random()*2+1;
+    const top = Math.random()*100;
+    const left = Math.random()*100;
+    const delay = Math.random()*4;
+    html += `<div class="star" style="width:${size}px;height:${size}px;top:${top}%;left:${left}%;animation-delay:${delay}s;"></div>`;
+  }
+  el.innerHTML = html;
+}
+
+function checkIcon(){
+  return `<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1a1200" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+async function loadState(){
+  try{
+    const res = await window.storage.list('', true);
+    if(res && res.keys){
+      for(const k of res.keys){
+        try{
+          const r = await window.storage.get(k, true);
+          if(r) state[k] = JSON.parse(r.value);
+        }catch(e){}
+      }
+    }
+  }catch(e){ console.log('no existing state'); }
+  render();
+}
+
+async function saveKey(key, value){
+  state[key] = value;
+  try{
+    await window.storage.set(key, JSON.stringify(value), true);
+    flashSaved();
+  }catch(e){ console.error('save failed', e); }
+}
+
+function flashSaved(){
+  const n = document.getElementById('saveNote');
+  n.classList.add('show');
+  clearTimeout(window._saveT);
+  window._saveT = setTimeout(()=>n.classList.remove('show'), 1200);
+}
+
+function toggleActivity(num){
+  const key = `activity:${num}`;
+  const cur = state[key] || {checked:false, note:''};
+  cur.checked = !cur.checked;
+  saveKey(key, cur);
+  updateProgress();
+  render();
+}
+
+function updateNote(key, val){
+  const cur = state[key] || {checked:false, note:''};
+  cur.note = val;
+  saveKey(key, cur);
+}
+
+function updateProgress(){
+  let done = 0;
+  for(let i=1;i<=101;i++){
+    if(state[`activity:${i}`] && state[`activity:${i}`].checked) done++;
+  }
+  const pct = Math.round(done/101*100);
+  document.getElementById('prog-text').textContent = `${done} / 101 réalisées`;
+  document.getElementById('prog-pct').textContent = `${pct}%`;
+  document.getElementById('prog-fill').style.width = `${pct}%`;
+}
+
+function renderTabs(){
+  const tabs = document.getElementById('tabs');
+  let html = '';
+  SECTIONS.forEach(s=>{
+    html += `<button class="tab ${activeTab==='s'+s.num?'active':''}" onclick="setTab('s${s.num}')">${s.num}. ${s.title}</button>`;
+  });
+  html += `<button class="tab ${activeTab==='questions'?'active':''}" onclick="setTab('questions')">Questions de couple</button>`;
+  tabs.innerHTML = html;
+}
+
+function setTab(id){
+  activeTab = id;
+  render();
+}
+
+function activityCard(num, title, desc, tip){
+  const key = `activity:${num}`;
+  const st = state[key] || {checked:false, note:''};
+  return `
+    <div class="card ${st.checked?'done':''}">
+      <div class="card-top">
+        <div class="checkbox ${st.checked?'checked':''}" onclick="toggleActivity(${num})">${checkIcon()}</div>
+        <div class="card-body">
+          <p class="card-title ${st.checked?'done':''}"><span class="num">#${num}</span>${title}</p>
+          <p class="card-desc">${desc}</p>
+          <p class="card-tip"><b>Astuce —</b> ${tip}</p>
+          <textarea class="note-input" placeholder="Notre note sur ce moment (optionnel)..." onchange="updateNote('${key}', this.value)">${st.note||''}</textarea>
+        </div>
+      </div>
+    </div>`;
+}
+
+function questionCard(themeIdx, qIdx, text){
+  const key = `answer:${themeIdx}:${qIdx}`;
+  const st = state[key] || {note:''};
+  return `
+    <div class="q-card">
+      <p class="q-text">— ${text}</p>
+      <textarea class="note-input" placeholder="Vos réponses..." onchange="updateNote('${key}', this.value)">${st.note||''}</textarea>
+    </div>`;
+}
+
+function render(){
+  renderTabs();
+  const panels = document.getElementById('panels');
+  if(activeTab === 'questions'){
+    let html = `<section class="panel active">
+      <div class="section-head"><div class="num">Bonus</div><h2>Questions de couple</h2></div>
+      <p class="section-intro">À utiliser lors de vos appels, dîners virtuels, ou juste comme ça, un soir de manque.</p>`;
+    QUESTIONS.forEach((theme, tIdx)=>{
+      html += `<div class="q-theme">${theme[0]}</div>`;
+      theme[1].forEach((q, qIdx)=>{
+        html += questionCard(tIdx, qIdx, q);
+      });
+    });
+    html += `</section>`;
+    panels.innerHTML = html;
+  } else {
+    const s = SECTIONS.find(sec => 's'+sec.num === activeTab);
+    let html = `<section class="panel active">
+      <div class="section-head"><div class="num">Section ${s.num}</div><h2>${s.title}</h2></div>
+      <p class="section-intro">${s.intro}</p>`;
+    s.acts.forEach(a=>{
+      html += activityCard(a[0], a[1], a[2], a[3]);
+    });
+    html += `</section>`;
+    panels.innerHTML = html;
+  }
+}
+
+starsBg();
+updateProgress();
+loadState();
+</script>
+</body>
+</html>
