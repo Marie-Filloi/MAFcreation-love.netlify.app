@@ -1,14 +1,31 @@
 rules_version = '2';
 service cloud.firestore {
+  function isRegisteredEmail(subscription) {
+    return request.auth != null &&
+      request.auth.token.email != null &&
+      (request.auth.token.email.lower() == subscription.email ||
+       request.auth.token.email.lower() == subscription.partnerEmail);
+  }
+
   match /databases/{database}/documents {
     match /couples/{code} {
-      allow read: if true;
+      // Only someone signed in as one of the two registered emails for this couple can read or touch it.
+      allow get: if isRegisteredEmail(resource.data.subscription);
+      allow list: if false;
       // Only the server (Stripe webhook, via firebase-admin) creates couple documents.
       allow create: if false;
-      // Clients may only ever touch gameplay state and mood/name — never the code, email, or subscription status.
-      allow update: if request.resource.data.diff(resource.data).affectedKeys()
-                      .hasOnly(['state', 'partners', 'updatedAt']);
+      // Signed-in partners may only ever touch gameplay state and mood/name, never the code, email, or subscription status.
+      allow update: if isRegisteredEmail(resource.data.subscription) &&
+                      request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['state', 'partners', 'updatedAt']);
       allow delete: if false;
+    }
+
+    match /emailToCode/{email} {
+      // A signed-in user may only ever look up their own email's mapping, never anyone else's.
+      allow get: if request.auth != null && request.auth.token.email != null &&
+                   request.auth.token.email.lower() == email;
+      allow list, create, update, delete: if false;
     }
   }
 }

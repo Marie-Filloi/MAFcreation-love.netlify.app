@@ -11,7 +11,11 @@ module.exports = async (req, res) => {
   try {
     const { name, email, partnerName, partnerEmail } = req.body || {};
     if (!email || typeof email !== 'string' || !email.includes('@')) {
-      res.status(400).json({ error: 'Email requis.' });
+      res.status(400).json({ error: 'Votre email est requis.' });
+      return;
+    }
+    if (!partnerEmail || typeof partnerEmail !== 'string' || !partnerEmail.includes('@')) {
+      res.status(400).json({ error: "L'email de votre partenaire est requis : c'est ce qui lui permettra de se connecter à votre espace, lui et lui seul." });
       return;
     }
     if (!name || typeof name !== 'string' || !name.trim() || !partnerName || typeof partnerName !== 'string' || !partnerName.trim()) {

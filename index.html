@@ -190,8 +190,8 @@
   .certificate .date{color:var(--text-dim);font-size:12.5px;font-style:italic;}
 
   /* Reward reveal modal */
-  #rewardModal{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;background:rgba(28,8,16,.82);padding:20px;}
-  #rewardModal.hidden{display:none;}
+  #rewardModal, #emailConfirmModal{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;background:rgba(28,8,16,.82);padding:20px;}
+  #rewardModal.hidden, #emailConfirmModal.hidden{display:none;}
   .reward-modal-box{max-width:420px;width:100%;background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:28px 24px;text-align:center;animation:popIn .3s ease;}
   @keyframes popIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
   .reward-modal-box .big-emoji{font-size:38px;margin-bottom:10px;}
@@ -222,27 +222,36 @@
     <div id="gateBanner"></div>
 
     <div class="gate-toggle">
-      <button class="gate-toggle-btn active" id="gtLogin" onclick="showGateMode('login')" type="button" data-i18n="gtLoginLabel">J'ai un code</button>
-      <button class="gate-toggle-btn" id="gtSub" onclick="showGateMode('subscribe')" type="button" data-i18n="gtSubLabel">Je n'ai pas de code</button>
+      <button class="gate-toggle-btn active" id="gtLogin" onclick="showGateMode('login')" type="button" data-i18n="gtLoginLabel">Se connecter</button>
+      <button class="gate-toggle-btn" id="gtSub" onclick="showGateMode('subscribe')" type="button" data-i18n="gtSubLabel">Je n'ai pas de compte</button>
     </div>
 
     <div id="gateLogin">
-      <p data-i18n="gateLoginIntro">Entrez le code reçu par email après votre abonnement pour accéder à votre espace de couple, privé et partagé entre vous deux.</p>
-      <input type="text" id="gateInput" class="gate-input" placeholder="VOTRE CODE" data-i18n-placeholder="gateInputPlaceholder" autocomplete="off">
-      <button class="gate-btn" onclick="submitCode()" type="button" data-i18n="gateBtnAccess">Accéder à notre espace</button>
+      <p data-i18n="gateLoginIntro">Entrez votre email : vous recevrez un lien de connexion personnel et sécurisé, sans mot de passe, valable uniquement pour votre adresse.</p>
+      <input type="email" id="gateEmailInput" class="gate-input" style="text-transform:none;" placeholder="VOTRE EMAIL" data-i18n-placeholder="gateEmailPlaceholder" autocomplete="off">
+      <button class="gate-btn" id="gateLoginBtn" onclick="requestLoginLink()" type="button" data-i18n="gateBtnAccess">Recevoir mon lien de connexion</button>
       <div class="gate-error" id="gateError"></div>
     </div>
 
     <div id="gateSubscribe" class="hidden">
-      <p class="gate-sub-text" data-i18n-html="subIntro">Abonnez-vous pour recevoir par email <b>votre code unique de couple</b>. Ce code n'est fait que pour vous deux : partagez-le avec une seule personne, votre partenaire. Si un jour vous souhaitez rejouer avec quelqu'un d'autre, un nouvel abonnement vous donnera un tout nouveau code. L'ancien restera l'histoire de votre couple d'avant.</p>
+      <p class="gate-sub-text" data-i18n-html="subIntro">Abonnez-vous pour créer votre espace privé. Il n'y a pas de code à partager : chacun de vous se connecte avec sa propre adresse email, indiquée ci-dessous. Si un jour vous souhaitez recommencer cette aventure avec quelqu'un d'autre, un nouvel abonnement créera un espace séparé.</p>
       <input type="text" id="subYourName" class="gate-input" style="text-transform:none;" placeholder="TON PRÉNOM" data-i18n-placeholder="subYourNamePlaceholder" autocomplete="off">
       <input type="email" id="subEmail" class="gate-input" style="text-transform:none;" placeholder="VOTRE EMAIL" data-i18n-placeholder="subEmailPlaceholder" autocomplete="off">
       <input type="text" id="subPartnerName" class="gate-input" style="text-transform:none;" placeholder="PRÉNOM DE TON/TA PARTENAIRE" data-i18n-placeholder="subPartnerNamePlaceholder" autocomplete="off">
-      <input type="email" id="subPartnerEmail" class="gate-input" style="text-transform:none;" placeholder="EMAIL DE VOTRE PARTENAIRE (optionnel)" data-i18n-placeholder="subPartnerPlaceholder" autocomplete="off">
-      <button class="gate-btn" id="subBtn" onclick="startSubscription()" type="button" data-i18n="subBtn">S'abonner et recevoir mon code</button>
+      <input type="email" id="subPartnerEmail" class="gate-input" style="text-transform:none;" placeholder="EMAIL DE VOTRE PARTENAIRE" data-i18n-placeholder="subPartnerPlaceholder" autocomplete="off">
+      <button class="gate-btn" id="subBtn" onclick="startSubscription()" type="button" data-i18n="subBtn">S'abonner et créer notre espace</button>
       <div class="gate-error" id="subError"></div>
-      <p class="gate-note" data-i18n="subNote">Le paiement est sécurisé par Stripe. Vous recevrez votre code par email dans les minutes qui suivent.</p>
+      <p class="gate-note" data-i18n="subNote">Le paiement est sécurisé par Stripe. Vous recevrez un email de bienvenue dans les minutes qui suivent.</p>
     </div>
+  </div>
+</div>
+<div id="emailConfirmModal" class="hidden">
+  <div class="reward-modal-box">
+    <p style="font-family:var(--serif);color:var(--gold-soft);font-size:19px;margin:0 0 14px;" data-i18n="confirmEmailTitle">Confirme ton email</p>
+    <p style="font-size:13px;color:var(--text-dim);margin:0 0 14px;" data-i18n="confirmEmailBody">Tu ouvres ce lien depuis un autre appareil. Retape ton email pour confirmer que ce lien de connexion est bien le tien.</p>
+    <input type="email" id="confirmEmailInput" class="gate-input" style="text-transform:none;" placeholder="VOTRE EMAIL" data-i18n-placeholder="gateEmailPlaceholder" autocomplete="off">
+    <button class="gate-btn" onclick="confirmEmailAndSignIn()" type="button" data-i18n="confirmEmailBtn">Confirmer</button>
+    <div class="gate-error" id="confirmEmailError"></div>
   </div>
 </div>
 <div id="rewardModal" class="hidden">
@@ -274,13 +283,18 @@
   <nav class="tabs" id="tabs"></nav>
   <div id="panels"></div>
 
-  <footer data-i18n="footer">Malgré la distance, vous êtes ensemble.</footer>
+  <footer>
+    <span data-i18n="footer">Malgré la distance, vous êtes ensemble.</span>
+    <span> · </span>
+    <a href="#" id="logoutLink" onclick="logout();return false;" style="color:inherit;" data-i18n="logoutLabel">Se déconnecter</a>
+  </footer>
 </div>
 <div class="save-note" id="saveNote" data-i18n="savedLabel">Enregistré ✓</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import { getAuth, isSignInWithEmailLink, signInWithEmailLink, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDeUetg4Wg6x91ptRQEcWQaqWWVRSSDBAI",
@@ -292,8 +306,14 @@ const firebaseConfig = {
 };
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+
+function normalizeEmail(raw){
+  return (raw || '').trim().toLowerCase();
+}
 
 let coupleCode = null;
+let coupleCreatedAt = null;
 let myRole = null; // 'A' or 'B'
 let unsubscribeSnapshot = null;
 let partners = {};
@@ -308,33 +328,37 @@ const STRINGS = {
     footer: "Malgré la distance, vous êtes ensemble.",
     savedLabel: "Enregistré ✓",
     copiedLabel: "Copié ✓",
-    gtLoginLabel: "J'ai un code",
-    gtSubLabel: "Je n'ai pas de code",
-    gateLoginIntro: "Entrez le code reçu par email après votre abonnement pour accéder à votre espace de couple, privé et partagé entre vous deux.",
-    gateInputPlaceholder: "VOTRE CODE",
-    gateBtnAccess: "Accéder à notre espace",
-    gateErrorEmpty: "Merci d'entrer votre code.",
+    gtLoginLabel: "Se connecter",
+    gtSubLabel: "Je n'ai pas de compte",
+    gateLoginIntro: "Entrez votre email : vous recevrez un lien de connexion personnel et sécurisé, sans mot de passe, valable uniquement pour votre adresse.",
+    gateEmailPlaceholder: "VOTRE EMAIL",
+    gateBtnAccess: "Recevoir mon lien de connexion",
+    gateBtnSending: "Envoi en cours...",
+    gateLoginSent: "Lien envoyé ! Vérifiez votre boîte mail (et vos spams) pour vous connecter.",
+    gateErrorEmpty: "Merci d'entrer votre email.",
     gateLoading: "Chargement de votre espace...",
-    gateErrorNotFound: "Ce code est introuvable. Vérifiez l'email reçu, ou abonnez-vous pour en recevoir un.",
-    gateErrorCanceled: "Cet abonnement n'est plus actif. Réabonnez-vous pour recevoir un nouveau code.",
+    gateErrorEmailNotFound: "Cet email n'est associé à aucun abonnement. Vérifiez l'orthographe, ou abonnez-vous.",
+    gateErrorCanceled: "Cet abonnement n'est plus actif. Réabonnez-vous pour continuer.",
     gateErrorGeneric: "Une erreur est survenue. Vérifiez votre connexion et réessayez.",
-    subIntro: "Abonnez-vous pour recevoir par email <b>votre code unique de couple</b>. Ce code est nominatif : il n'appartient qu'à toi et à la personne dont tu donnes le prénom ci-dessous. Si tu veux jouer avec quelqu'un d'autre, un nouvel abonnement te donnera un autre code, propre à cette nouvelle histoire.",
+    gateErrorLinkExpired: "Ce lien a expiré ou est invalide. Redemandez-en un nouveau ci-dessous.",
+    confirmEmailTitle: "Confirme ton email",
+    confirmEmailBody: "Tu ouvres ce lien depuis un autre appareil. Retape ton email pour confirmer que ce lien de connexion est bien le tien.",
+    confirmEmailBtn: "Confirmer",
+    logoutLabel: "Se déconnecter",
+    subIntro: "Abonnez-vous pour créer votre espace privé. Il n'y a pas de code à partager : chacun de vous se connecte avec sa propre adresse email, indiquée ci-dessous. Si un jour vous souhaitez recommencer cette aventure avec quelqu'un d'autre, un nouvel abonnement créera un espace séparé.",
     subYourNamePlaceholder: "TON PRÉNOM",
     subEmailPlaceholder: "VOTRE EMAIL",
     subPartnerNamePlaceholder: "PRÉNOM DE TON/TA PARTENAIRE",
-    subPartnerPlaceholder: "EMAIL DE VOTRE PARTENAIRE (optionnel)",
-    subBtn: "S'abonner et recevoir mon code",
+    subPartnerPlaceholder: "EMAIL DE VOTRE PARTENAIRE",
+    subBtn: "S'abonner et créer notre espace",
     subBtnLoading: "Redirection vers le paiement...",
-    subNote: "Le paiement est sécurisé par Stripe. Vous recevrez votre code par email dans les minutes qui suivent.",
+    subNote: "Le paiement est sécurisé par Stripe. Vous recevrez un email de bienvenue dans les minutes qui suivent.",
     subErrorEmail: "Merci d'entrer un email valide.",
+    subErrorPartnerEmail: "Merci d'entrer l'email de votre partenaire : c'est ce qui lui permettra de se connecter à votre espace, lui et lui seul.",
     subErrorNames: "Merci d'indiquer ton prénom et celui de ton/ta partenaire.",
-    whoAreYouTitle: "Qui es-tu ?",
     subErrorGeneric: "Impossible de démarrer le paiement pour le moment. Réessayez dans un instant.",
-    bannerSubscribed1: "Merci pour votre abonnement 💛 Vérifiez votre boîte mail (et vos spams) : votre code unique de couple arrive dans quelques minutes.",
+    bannerSubscribed1: "Merci pour votre abonnement 💛 Vérifiez votre boîte mail (et vos spams) : un email de bienvenue arrive dans quelques minutes.",
     bannerSubscribed0: "Le paiement a été annulé. Vous pouvez réessayer quand vous voulez.",
-    promptFirstName: "Bienvenue ! Quel est ton prénom ?",
-    promptSecondName: "Bienvenue ! {name} t'attend. Quel est ton prénom ?",
-    defaultName: "Moi",
     progressText: "{done} / 101 réalisées",
     moodYours: "Ton humeur",
     moodOf: "Humeur de",
@@ -347,11 +371,25 @@ const STRINGS = {
     timeDAgo: "il y a {n} j",
     tabQuestions: "Questions de couple",
     tabRewards: "Nos cadeaux 🎁",
+    tabJournal: "Notre histoire 📖",
+    journalIntro: "Cet espace se remplit tout seul, au fil de vos notes et de vos humeurs. Plus vous avancez ensemble, plus il raconte votre histoire.",
+    journalViewTimeline: "Journal",
+    journalViewMonthly: "Bilan mensuel",
+    journalEmpty: "Aucune note pour l'instant. Écrivez une note sur une activité ou une question, elle apparaîtra ici.",
+    journalPrevMonth: "Mois précédent",
+    journalNextMonth: "Mois suivant",
+    journalMonthEmpty: "Rien à afficher pour ce mois. Cochez des activités et écrivez des notes pour remplir votre bilan.",
+    journalStatsActivities: "{n} activité(s) réalisée(s) ce mois-ci",
+    journalStatsNotes: "{n} note(s) écrite(s) ce mois-ci",
+    journalTopMood: "Humeur la plus fréquente : {emoji} {label} ({n} fois)",
+    journalFeatured: "Souvenir du mois",
     questionsIntro: "À utiliser lors de vos appels, dîners virtuels, ou juste comme ça, un soir de manque.",
     questionsPlaceholder: "Vos réponses...",
     notePlaceholder: "Notre note sur ce moment (optionnel)...",
     rewardsIntro: "Chaque section terminée débloque un petit cadeau : un conseil, une recommandation, une lettre, un guide de réconciliation. Terminez les 101 activités pour débloquer votre récompense finale.",
     rewardLockedTemplate: "🔒 Débloqué après avoir terminé la section « {title} »",
+    sectionLockedTemplate: "🔒 Cette section se débloque le {date}, avec votre abonnement. Un nouveau chapitre chaque mois !",
+    themeLockedTemplate: "🔒 « {title} » se débloque le {date}.",
     rewardCopyBtn: "Copier le texte",
     rewardFinaleLocked: "🔒 Votre certificat final s'affichera ici quand les 101 activités seront terminées.",
     rewardsHeading: "Nos cadeaux",
@@ -372,33 +410,37 @@ const STRINGS = {
     footer: "Despite the distance, you are together.",
     savedLabel: "Saved ✓",
     copiedLabel: "Copied ✓",
-    gtLoginLabel: "I have a code",
-    gtSubLabel: "I don't have a code",
-    gateLoginIntro: "Enter the code you received by email after subscribing to access your private couple space, shared between you two.",
-    gateInputPlaceholder: "YOUR CODE",
-    gateBtnAccess: "Enter our space",
-    gateErrorEmpty: "Please enter your code.",
+    gtLoginLabel: "Log in",
+    gtSubLabel: "I don't have an account",
+    gateLoginIntro: "Enter your email: you'll receive a personal, secure login link, no password needed, valid only for your address.",
+    gateEmailPlaceholder: "YOUR EMAIL",
+    gateBtnAccess: "Send me my login link",
+    gateBtnSending: "Sending...",
+    gateLoginSent: "Link sent! Check your inbox (and spam folder) to log in.",
+    gateErrorEmpty: "Please enter your email.",
     gateLoading: "Loading your space...",
-    gateErrorNotFound: "This code wasn't found. Check the email you received, or subscribe to get one.",
-    gateErrorCanceled: "This subscription is no longer active. Subscribe again to receive a new code.",
+    gateErrorEmailNotFound: "This email isn't linked to any subscription. Check the spelling, or subscribe.",
+    gateErrorCanceled: "This subscription is no longer active. Subscribe again to continue.",
     gateErrorGeneric: "Something went wrong. Check your connection and try again.",
-    subIntro: "Subscribe to receive <b>your unique couple code</b> by email. This code is tied to your name and the name of the partner you enter below. If you ever want to play with someone else, a new subscription will give you a different code for that new story.",
+    gateErrorLinkExpired: "This link has expired or is invalid. Request a new one below.",
+    confirmEmailTitle: "Confirm your email",
+    confirmEmailBody: "You're opening this link from a different device. Retype your email to confirm this login link is yours.",
+    confirmEmailBtn: "Confirm",
+    logoutLabel: "Log out",
+    subIntro: "Subscribe to create your private space. There's no code to share: each of you logs in with your own email address, entered below. If you ever want to start this journey with someone else, a new subscription will create a separate space.",
     subYourNamePlaceholder: "YOUR FIRST NAME",
     subEmailPlaceholder: "YOUR EMAIL",
     subPartnerNamePlaceholder: "YOUR PARTNER'S FIRST NAME",
-    subPartnerPlaceholder: "YOUR PARTNER'S EMAIL (optional)",
-    subBtn: "Subscribe and get my code",
+    subPartnerPlaceholder: "YOUR PARTNER'S EMAIL",
+    subBtn: "Subscribe and create our space",
     subBtnLoading: "Redirecting to payment...",
-    subNote: "Payment is secured by Stripe. You'll receive your code by email within minutes.",
+    subNote: "Payment is secured by Stripe. You'll receive a welcome email within minutes.",
     subErrorEmail: "Please enter a valid email.",
+    subErrorPartnerEmail: "Please enter your partner's email: it's what lets them log into your space, and only them.",
     subErrorNames: "Please enter your first name and your partner's first name.",
-    whoAreYouTitle: "Who are you?",
     subErrorGeneric: "Couldn't start the payment right now. Please try again in a moment.",
-    bannerSubscribed1: "Thank you for subscribing 💛 Check your inbox (and spam folder): your unique couple code is arriving within minutes.",
+    bannerSubscribed1: "Thank you for subscribing 💛 Check your inbox (and spam folder): a welcome email is arriving within minutes.",
     bannerSubscribed0: "Payment was canceled. You can try again anytime.",
-    promptFirstName: "Welcome! What's your first name?",
-    promptSecondName: "Welcome! {name} is waiting for you. What's your first name?",
-    defaultName: "Me",
     progressText: "{done} / 101 completed",
     moodYours: "Your mood",
     moodOf: "Mood of",
@@ -411,11 +453,25 @@ const STRINGS = {
     timeDAgo: "{n} d ago",
     tabQuestions: "Couple questions",
     tabRewards: "Our gifts 🎁",
+    tabJournal: "Our story 📖",
+    journalIntro: "This space fills itself in, from your notes and your moods. The more you go through together, the more it tells your story.",
+    journalViewTimeline: "Journal",
+    journalViewMonthly: "Monthly recap",
+    journalEmpty: "No notes yet. Write a note on an activity or a question, and it'll show up here.",
+    journalPrevMonth: "Previous month",
+    journalNextMonth: "Next month",
+    journalMonthEmpty: "Nothing to show for this month. Check off activities and write notes to fill in your recap.",
+    journalStatsActivities: "{n} activities completed this month",
+    journalStatsNotes: "{n} notes written this month",
+    journalTopMood: "Most frequent mood: {emoji} {label} ({n} times)",
+    journalFeatured: "Memory of the month",
     questionsIntro: "Use these during your calls, virtual dinners, or just any evening you're missing each other.",
     questionsPlaceholder: "Your answers...",
     notePlaceholder: "Our note about this moment (optional)...",
     rewardsIntro: "Every completed section unlocks a small gift: advice, a recommendation, a letter, a reconciliation guide. Finish all 101 activities to unlock your final reward.",
     rewardLockedTemplate: "🔒 Unlocked after completing the \"{title}\" section",
+    sectionLockedTemplate: "🔒 This section unlocks on {date}, as part of your subscription. A new chapter every month!",
+    themeLockedTemplate: "🔒 \"{title}\" unlocks on {date}.",
     rewardCopyBtn: "Copy text",
     rewardFinaleLocked: "🔒 Your final certificate will appear here once all 101 activities are completed.",
     certificateKicker: "Long-distance love certificate",
@@ -764,56 +820,120 @@ const QUESTIONS_ALL = { fr: [
     "Qu'est-ce que tu as appris sur toi-même depuis qu'on est ensemble ?",
     "Quelle chanson te fait penser à moi, et depuis quand ?",
     "Si tu devais décrire notre relation en trois mots, lesquels choisirais-tu ?",
-    "Qu'est-ce qui t'a fait tomber amoureux/amoureuse de moi, au juste ?"
+    "Qu'est-ce qui t'a fait tomber amoureux/amoureuse de moi, au juste ?",
+    "Qu'est-ce que je fais aujourd'hui qui surprendrait la personne que j'étais au début ?",
+    "Quel est un petit détail chez moi que tu as remarqué récemment et que tu ne m'as jamais dit ?",
+    "Si tu devais me présenter à quelqu'un qui ne me connaît pas du tout, comment tu me décrirais ?"
   ]],
   ["Pour parler de la distance",[
     "Qu'est-ce qui te manque le plus de moi en ce moment ?",
     "Comment tu gères les moments où la distance pèse trop ?",
     "Qu'est-ce que je pourrais faire pour te faire sentir plus proche de moi ?",
     "Y a-t-il un moment récent où tu t'es senti(e) seul(e) et que tu ne m'as pas dit ?",
-    "Qu'est-ce qui t'aide à tenir, les jours difficiles ?"
+    "Qu'est-ce qui t'aide à tenir, les jours difficiles ?",
+    "Y a-t-il une habitude prise depuis qu'on est loin que tu voudrais garder même une fois réunis ?",
+    "Quel jour de la semaine est le plus dur pour toi, question distance ?",
+    "Qu'est-ce qui t'aiderait à te sentir moins seul(e) la prochaine fois que ça devient difficile ?"
   ]],
   ["Pour rêver ensemble",[
     "À quoi ressemble notre vie quand la distance sera terminée ?",
     "Quel est le premier voyage qu'on devrait faire ensemble ?",
     "Où est-ce que tu nous imagines vivre, un jour ?",
     "Quelle tradition aimerais-tu qu'on crée, tous les deux ?",
-    "Si on pouvait vivre n'importe où pendant un an, où irait-on ?"
+    "Si on pouvait vivre n'importe où pendant un an, où irait-on ?",
+    "Quel petit rituel du quotidien as-tu hâte de partager avec moi une fois réunis ?",
+    "Y a-t-il une compétence que tu aimerais qu'on apprenne ensemble un jour ?",
+    "Si on pouvait recréer un seul souvenir ensemble, en mieux, lequel choisirais-tu ?"
   ]],
   ["Pour approfondir",[
     "Qu'est-ce que tu attends de moi que je ne t'offre pas encore ?",
     "Comment je peux mieux te soutenir dans les moments difficiles ?",
     "Qu'est-ce qui te fait te sentir aimé(e) au quotidien ?",
     "Y a-t-il quelque chose que tu n'as jamais osé me dire ?",
-    "Qu'est-ce que la distance nous a appris sur nous, en tant que couple ?"
+    "Qu'est-ce que la distance nous a appris sur nous, en tant que couple ?",
+    "Quelle est la chose la plus difficile à me dire, même maintenant ?",
+    "Qu'est-ce que tu voudrais que je comprenne mieux à propos de toi ?",
+    "Y a-t-il un moment où tu as eu besoin de moi et où je n'étais pas vraiment là ?"
   ]],
   ["Pour rire un peu",[
     "Quelle est la chose la plus étrange que tu fais quand tu penses à moi ?",
     "Si j'étais un emoji, lequel serais-je ?",
     "Quel est le truc le plus mignon (ou le plus gênant) que j'ai fait sans le savoir ?",
     "Si on avait un thème musical de couple, ce serait quoi ?",
-    "Qu'est-ce que tu ferais si je débarquais chez toi là, maintenant, par surprise ?"
+    "Qu'est-ce que tu ferais si je débarquais chez toi là, maintenant, par surprise ?",
+    "Quel est le surnom le plus ridicule que tu me donnerais si tu devais en inventer un maintenant ?",
+    "Si notre relation était un film, quel serait le titre ?",
+    "Quelle est la chose la plus bizarre que tu as faite pour me manquer un peu moins ?"
   ]],
   ["Pour la confiance",[
     "Qu'est-ce qui te rassure le plus quand le doute s'installe ?",
     "Comment je peux te prouver ma fidélité même à distance ?",
     "Y a-t-il quelque chose que je fais qui te met mal à l'aise, même involontairement ?",
     "Qu'est-ce qui renforce ta confiance en nous, jour après jour ?",
-    "Si tu pouvais changer une chose dans notre communication, ce serait quoi ?"
+    "Si tu pouvais changer une chose dans notre communication, ce serait quoi ?",
+    "Qu'est-ce qui t'aide à ne pas imaginer le pire quand je ne réponds pas tout de suite ?",
+    "Y a-t-il quelque chose que tu aimerais que je partage plus souvent pour te rassurer ?",
+    "Qu'est-ce qui, pour toi, prouve qu'on peut se faire confiance à distance ?"
   ]],
   ["Pour la famille et l'avenir",[
     "Comment imagines-tu présenter notre relation à ta famille ?",
     "Combien d'enfants aimerais-tu avoir, si tu en veux ?",
     "Quelles traditions familiales aimerais-tu qu'on garde ensemble ?",
     "Qu'est-ce qui compte le plus pour toi dans un futur foyer ?",
-    "Comment veux-tu qu'on célèbre nos anniversaires plus tard ?"
+    "Comment veux-tu qu'on célèbre nos anniversaires plus tard ?",
+    "Comment veux-tu qu'on gère les désaccords avec nos familles respectives, plus tard ?",
+    "Y a-t-il une tradition de ta famille que tu ne veux surtout pas perdre ?",
+    "À quoi ressemblerait, pour toi, un dimanche parfait dans notre futur foyer ?"
   ]],
   ["Pour l'argent et la vie pratique",[
     "Comment vois-tu la gestion des finances dans un couple ?",
     "Qu'est-ce qui est important pour toi dans notre futur mode de vie ?",
     "Préfères-tu épargner pour un voyage ou pour une maison, en premier ?",
     "Comment veux-tu qu'on organise notre quotidien une fois réunis ?",
-    "Quel est ton rêve professionnel, et comment je peux te soutenir dedans ?"
+    "Quel est ton rêve professionnel, et comment je peux te soutenir dedans ?",
+    "Comment tu réagis face à une dépense imprévue, et comment on devrait gérer ça à deux ?",
+    "Qu'est-ce qui compte le plus pour toi : la sécurité financière ou la liberté de voyager ?",
+    "Y a-t-il une dépense que tu considères comme non négociable dans notre futur budget ?"
+  ]],
+  ["Pour mieux communiquer",[
+    "Comment préfères-tu qu'on règle un désaccord : en discuter tout de suite, ou prendre du recul d'abord ?",
+    "Qu'est-ce que je fais parfois qui te donne l'impression que je ne t'écoute pas vraiment ?",
+    "Comment sais-tu que j'ai vraiment compris ce que tu ressens ?",
+    "Y a-t-il un mot ou un ton que j'utilise qui te touche plus que je ne le pense ?",
+    "Qu'est-ce qui t'aide à te sentir en sécurité pour me dire les choses difficiles ?",
+    "Préfères-tu qu'on communique plus par messages, par appels, ou en vidéo ? Pourquoi ?",
+    "Qu'est-ce que tu voudrais qu'on arrête de faire quand on ne se comprend pas ?",
+    "Comment aimerais-tu que je te le dise si quelque chose que j'ai fait t'a blessé(e) ?"
+  ]],
+  ["Pour rester connectés au quotidien",[
+    "Qu'est-ce qui t'a fait sourire aujourd'hui, même une seconde ?",
+    "Quel a été le moment le plus dur de ta journée ?",
+    "Qu'est-ce que tu as mangé aujourd'hui que tu recommanderais ?",
+    "Y a-t-il quelque chose que tu attends avec impatience cette semaine ?",
+    "Comment se sent ton corps aujourd'hui : fatigué, en forme, autre chose ?",
+    "Quelle chanson tourne dans ta tête depuis ce matin ?",
+    "Qu'est-ce que tu as remis à demain aujourd'hui, et pourquoi ?",
+    "Sur une échelle de 1 à 10, comment tu te sens là maintenant, et pourquoi ce chiffre ?"
+  ]],
+  ["Pour l'intimité et la complicité",[
+    "Qu'est-ce qui te fait te sentir désiré(e), même à distance ?",
+    "Quel souvenir intime entre nous te revient le plus souvent en tête ?",
+    "Comment aimerais-tu qu'on garde la flamme, même loin l'un de l'autre ?",
+    "Qu'est-ce qui te manque le plus physiquement de notre relation ?",
+    "Y a-t-il une façon dont tu aimerais que je te montre de la tendresse, même par écran ?",
+    "Quel est le compliment physique qui te touche le plus venant de moi ?",
+    "Qu'est-ce qui te met le plus à l'aise pour parler de désir avec moi ?",
+    "Si tu devais décrire notre alchimie en une image ou une métaphore, ce serait quoi ?"
+  ]],
+  ["Pour grandir, chacun de son côté",[
+    "Qu'est-ce que tu apprends sur toi-même en ce moment, indépendamment de nous ?",
+    "Y a-t-il un projet personnel que tu aimerais que je te pousse à réaliser ?",
+    "Comment je peux te soutenir dans tes objectifs sans avoir l'impression de te mettre la pression ?",
+    "Qu'est-ce que la distance t'a appris sur ta propre indépendance ?",
+    "Y a-t-il une peur personnelle, pas liée à nous, que tu traverses en ce moment ?",
+    "Qu'est-ce que tu es fier/fière d'avoir accompli seul(e) récemment ?",
+    "Comment veux-tu qu'on célèbre nos réussites individuelles, même loin l'un de l'autre ?",
+    "Qu'est-ce qui te fait te sentir toi-même, peu importe où tu es ou avec qui ?"
   ]]
 ], en: [
   ["To rediscover each other",[
@@ -821,62 +941,128 @@ const QUESTIONS_ALL = { fr: [
     "What have you learned about yourself since we've been together?",
     "What song reminds you of me, and since when?",
     "If you had to describe our relationship in three words, what would they be?",
-    "What exactly made you fall in love with me?"
+    "What exactly made you fall in love with me?",
+    "What do I do today that would surprise the person I was when we first met?",
+    "What's a small thing about me you've noticed recently that you've never mentioned?",
+    "If you had to introduce me to someone who's never met me, how would you describe me?"
   ]],
   ["To talk about the distance",[
     "What do you miss most about me right now?",
     "How do you cope when the distance feels like too much?",
     "What could I do to make you feel closer to me?",
     "Was there a recent moment you felt lonely that you didn't tell me about?",
-    "What helps you get through the hard days?"
+    "What helps you get through the hard days?",
+    "Is there a habit you've picked up since we've been apart that you'd want to keep once we're reunited?",
+    "Which day of the week is hardest for you, distance-wise?",
+    "What would help you feel less alone the next time things get hard?"
   ]],
   ["To dream together",[
     "What does our life look like once the distance is over?",
     "What's the first trip we should take together?",
     "Where do you imagine us living, someday?",
     "What tradition would you like us to create together?",
-    "If we could live anywhere for a year, where would we go?"
+    "If we could live anywhere for a year, where would we go?",
+    "What small everyday ritual are you looking forward to sharing with me once we're reunited?",
+    "Is there a skill you'd like us to learn together someday?",
+    "If we could recreate one memory together, better this time, which one would you pick?"
   ]],
   ["To go deeper",[
     "What do you need from me that I'm not giving you yet?",
     "How can I better support you during hard times?",
     "What makes you feel loved on an ordinary day?",
     "Is there something you've never dared to tell me?",
-    "What has the distance taught us about ourselves as a couple?"
+    "What has the distance taught us about ourselves as a couple?",
+    "What's the hardest thing to tell me, even now?",
+    "What do you wish I understood better about you?",
+    "Was there a time you needed me and I wasn't really there?"
   ]],
   ["To laugh a little",[
     "What's the strangest thing you do when you think of me?",
     "If I were an emoji, which one would I be?",
     "What's the cutest (or most embarrassing) thing I've done without realizing it?",
     "If we had a couple theme song, what would it be?",
-    "What would you do if I showed up at your place right now, out of nowhere?"
+    "What would you do if I showed up at your place right now, out of nowhere?",
+    "What's the most ridiculous nickname you'd give me if you had to invent one right now?",
+    "If our relationship were a movie, what would the title be?",
+    "What's the strangest thing you've done to miss me a little less?"
   ]],
   ["For trust",[
     "What reassures you most when doubt creeps in?",
     "How can I prove my faithfulness to you even from afar?",
     "Is there something I do, even unintentionally, that makes you uncomfortable?",
     "What strengthens your trust in us, day after day?",
-    "If you could change one thing about how we communicate, what would it be?"
+    "If you could change one thing about how we communicate, what would it be?",
+    "What helps you not jump to the worst conclusion when I don't reply right away?",
+    "Is there something you'd like me to share more often to reassure you?",
+    "What, to you, proves that we can trust each other from a distance?"
   ]],
   ["For family and the future",[
     "How do you imagine introducing our relationship to your family?",
     "How many kids would you like to have, if any?",
     "What family traditions would you like us to keep together?",
     "What matters most to you in a future home?",
-    "How do you want us to celebrate our anniversaries later on?"
+    "How do you want us to celebrate our anniversaries later on?",
+    "How do you want us to handle disagreements with our respective families, later on?",
+    "Is there a family tradition of yours you really don't want to lose?",
+    "What would a perfect Sunday look like in our future home, to you?"
   ]],
   ["For money and practical life",[
     "How do you see managing finances as a couple?",
     "What matters to you in our future lifestyle?",
     "Would you rather save for a trip or a house first?",
     "How do you want us to organize our daily life once we're reunited?",
-    "What's your career dream, and how can I support you in it?"
+    "What's your career dream, and how can I support you in it?",
+    "How do you react to an unexpected expense, and how should we handle that together?",
+    "What matters more to you: financial security or the freedom to travel?",
+    "Is there an expense you consider non-negotiable in our future budget?"
+  ]],
+  ["For better communication",[
+    "How do you prefer we handle a disagreement: talk it out right away, or take a step back first?",
+    "What do I sometimes do that makes you feel like I'm not really listening?",
+    "How do you know when I've truly understood how you feel?",
+    "Is there a word or a tone I use that affects you more than I realize?",
+    "What helps you feel safe telling me hard things?",
+    "Do you prefer we communicate more by text, calls, or video? Why?",
+    "What would you want us to stop doing when we don't understand each other?",
+    "How would you like me to find out if something I did hurt you?"
+  ]],
+  ["To stay connected day to day",[
+    "What made you smile today, even for a second?",
+    "What was the hardest moment of your day?",
+    "What did you eat today that you'd recommend?",
+    "Is there something you're looking forward to this week?",
+    "How does your body feel today: tired, energized, something else?",
+    "What song has been stuck in your head since this morning?",
+    "What did you put off until tomorrow today, and why?",
+    "On a scale of 1 to 10, how are you feeling right now, and why that number?"
+  ]],
+  ["For intimacy and closeness",[
+    "What makes you feel desired, even from a distance?",
+    "Which intimate memory of us comes to mind the most often?",
+    "How would you like us to keep the spark alive, even far apart?",
+    "What do you miss most physically about our relationship?",
+    "Is there a way you'd like me to show you tenderness, even through a screen?",
+    "What physical compliment from me touches you the most?",
+    "What makes it easiest for you to talk about desire with me?",
+    "If you had to describe our chemistry in one image or metaphor, what would it be?"
+  ]],
+  ["To grow, each in your own way",[
+    "What are you learning about yourself right now, independent of us?",
+    "Is there a personal project you'd like me to push you to pursue?",
+    "How can I support your goals without it feeling like pressure?",
+    "What has the distance taught you about your own independence?",
+    "Is there a personal fear, unrelated to us, that you're going through right now?",
+    "What are you proud of having accomplished on your own recently?",
+    "How do you want us to celebrate our individual wins, even while apart?",
+    "What makes you feel most like yourself, no matter where you are or who you're with?"
   ]]
 ]};
 let QUESTIONS = QUESTIONS_ALL[lang];
 
 let state = {}; // key -> {checked, note}
 let activeTab = "s1";
+let journalView = "timeline";
+let journalMonthOffset = 0;
 
 function starsBg(){
   const el = document.getElementById('stars');
@@ -913,10 +1099,6 @@ function checkIcon(){
   return `<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1a1200" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
-function normalizeCode(raw){
-  return raw.trim().toUpperCase().replace(/\s+/g,'');
-}
-
 function showGateMode(mode){
   document.getElementById('gtLogin').classList.toggle('active', mode==='login');
   document.getElementById('gtSub').classList.toggle('active', mode==='subscribe');
@@ -939,6 +1121,10 @@ async function startSubscription(){
   }
   if(!email || !email.includes('@')){
     errorEl.textContent = tr('subErrorEmail');
+    return;
+  }
+  if(!partnerEmail || !partnerEmail.includes('@')){
+    errorEl.textContent = tr('subErrorPartnerEmail');
     return;
   }
   btn.disabled = true;
@@ -974,52 +1160,6 @@ function showGateBanner(){
   }
 }
 
-function chooseRoleUI(nameA, nameB){
-  return new Promise(resolve=>{
-    const overlay = document.createElement('div');
-    overlay.id = 'roleChooser';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:26;display:flex;align-items:center;justify-content:center;background:rgba(28,8,16,.9);padding:20px;';
-    overlay.innerHTML = `
-      <div style="max-width:360px;width:100%;background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:28px 24px;text-align:center;">
-        <p style="font-family:var(--serif);color:var(--gold-soft);font-size:19px;margin:0 0 18px;">${tr('whoAreYouTitle')}</p>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <button id="roleBtnA" class="gate-btn" type="button">${nameA}</button>
-          <button id="roleBtnB" class="gate-btn" type="button">${nameB}</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    overlay.querySelector('#roleBtnA').addEventListener('click', ()=>{ overlay.remove(); resolve('A'); });
-    overlay.querySelector('#roleBtnB').addEventListener('click', ()=>{ overlay.remove(); resolve('B'); });
-  });
-}
-
-async function identifyRole(data){
-  partners = data.partners || {};
-  const roleKey = `couple_role_${coupleCode}`;
-  const savedRole = localStorage.getItem(roleKey);
-  if(savedRole && partners[savedRole]){
-    myRole = savedRole;
-    return;
-  }
-  const ref = doc(db, 'couples', coupleCode);
-  if(!partners.A){
-    const name = (window.prompt(tr('promptFirstName')) || tr('defaultName')).trim().slice(0,30);
-    partners.A = {name, emoji:'', label:'', updatedAt: Date.now()};
-    myRole = 'A';
-    localStorage.setItem(roleKey, 'A');
-    await setDoc(ref, {partners}, {merge:true});
-  } else if(!partners.B){
-    const name = (window.prompt(tr('promptSecondName', {name: partners.A.name})) || tr('defaultName')).trim().slice(0,30);
-    partners.B = {name, emoji:'', label:'', updatedAt: Date.now()};
-    myRole = 'B';
-    localStorage.setItem(roleKey, 'B');
-    await setDoc(ref, {partners}, {merge:true});
-  } else {
-    myRole = await chooseRoleUI(partners.A.name, partners.B.name);
-    localStorage.setItem(roleKey, myRole);
-  }
-}
-
 function attachRealtimeSync(){
   if(unsubscribeSnapshot) unsubscribeSnapshot();
   const ref = doc(db, 'couples', coupleCode);
@@ -1038,36 +1178,74 @@ function attachRealtimeSync(){
   });
 }
 
-async function submitCode(){
-  const input = document.getElementById('gateInput');
+async function requestLoginLink(){
+  const input = document.getElementById('gateEmailInput');
   const errorEl = document.getElementById('gateError');
-  const code = normalizeCode(input.value || '');
-  if(!code){
+  const btn = document.getElementById('gateLoginBtn');
+  const email = normalizeEmail(input.value || '');
+  if(!email || !email.includes('@')){
+    errorEl.className = 'gate-error';
     errorEl.textContent = tr('gateErrorEmpty');
     return;
   }
-  errorEl.textContent = '';
-  errorEl.className = 'gate-loading';
-  errorEl.textContent = tr('gateLoading');
+  btn.disabled = true;
+  btn.textContent = tr('gateBtnSending');
   try{
-    coupleCode = code;
+    const res = await fetch('/api/request-login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    const data = await res.json();
+    if(!res.ok){
+      throw new Error(data.error || 'unknown');
+    }
+    window.localStorage.setItem('emailForSignIn', email);
+    errorEl.className = 'gate-loading';
+    errorEl.textContent = tr('gateLoginSent');
+  }catch(e){
+    console.error(e);
+    errorEl.className = 'gate-error';
+    errorEl.textContent = tr('gateErrorEmailNotFound');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = tr('gateBtnAccess');
+  }
+}
+window.requestLoginLink = requestLoginLink;
+
+async function openCoupleSpace(userEmail){
+  const errorEl = document.getElementById('gateError');
+  try{
+    const emailRef = doc(db, 'emailToCode', userEmail);
+    const emailSnap = await getDoc(emailRef);
+    if(!emailSnap.exists()){
+      errorEl.className = 'gate-error';
+      errorEl.textContent = tr('gateErrorEmailNotFound');
+      await signOut(auth);
+      return;
+    }
+    coupleCode = emailSnap.data().code;
     const ref = doc(db, 'couples', coupleCode);
     const snap = await getDoc(ref);
     if(!snap.exists()){
       errorEl.className = 'gate-error';
-      errorEl.textContent = tr('gateErrorNotFound');
+      errorEl.textContent = tr('gateErrorGeneric');
       return;
     }
     const data = snap.data();
-    if(data.subscription && data.subscription.status === 'canceled'){
+    const sub = data.subscription || {};
+    if(sub.status === 'canceled'){
       errorEl.className = 'gate-error';
       errorEl.textContent = tr('gateErrorCanceled');
       showGateMode('subscribe');
+      await signOut(auth);
       return;
     }
+    partners = data.partners || {};
     state = data.state || {};
-    await identifyRole(data);
-    localStorage.setItem('couple_code', coupleCode);
+    coupleCreatedAt = data.createdAt || Date.now();
+    myRole = (userEmail === normalizeEmail(sub.email)) ? 'A' : 'B';
     document.getElementById('gate').classList.add('hidden');
     document.getElementById('app-content').classList.add('visible');
     attachRealtimeSync();
@@ -1080,16 +1258,58 @@ async function submitCode(){
     errorEl.textContent = tr('gateErrorGeneric');
   }
 }
-window.submitCode = submitCode;
+
+async function confirmEmailAndSignIn(){
+  const input = document.getElementById('confirmEmailInput');
+  const errorEl = document.getElementById('confirmEmailError');
+  const email = normalizeEmail(input.value || '');
+  if(!email || !email.includes('@')){
+    errorEl.textContent = tr('gateErrorEmpty');
+    return;
+  }
+  try{
+    await signInWithEmailLink(auth, email, window.location.href);
+    document.getElementById('emailConfirmModal').classList.add('hidden');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }catch(e){
+    console.error(e);
+    errorEl.textContent = tr('gateErrorLinkExpired');
+  }
+}
+window.confirmEmailAndSignIn = confirmEmailAndSignIn;
+
+function logout(){
+  signOut(auth).then(()=>{
+    window.location.href = window.location.pathname;
+  });
+}
+window.logout = logout;
 
 async function loadState(){
   showGateBanner();
-  const saved = localStorage.getItem('couple_code');
-  if(saved){
-    document.getElementById('gateInput').value = saved;
-    await submitCode();
+
+  onAuthStateChanged(auth, (user)=>{
+    if(user && user.email){
+      openCoupleSpace(normalizeEmail(user.email));
+    }
+  });
+
+  if(isSignInWithEmailLink(auth, window.location.href)){
+    const savedEmail = window.localStorage.getItem('emailForSignIn');
+    if(savedEmail){
+      try{
+        await signInWithEmailLink(auth, savedEmail, window.location.href);
+        window.localStorage.removeItem('emailForSignIn');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }catch(e){
+        console.error(e);
+        document.getElementById('gateError').className = 'gate-error';
+        document.getElementById('gateError').textContent = tr('gateErrorLinkExpired');
+      }
+    } else {
+      document.getElementById('emailConfirmModal').classList.remove('hidden');
+    }
   }
-  // otherwise, gate stays visible waiting for user input
 }
 
 function setMyMood(emoji, label){
@@ -1098,6 +1318,9 @@ function setMyMood(emoji, label){
   cur.emoji = emoji;
   cur.label = label;
   cur.updatedAt = Date.now();
+  const history = Array.isArray(cur.moodHistory) ? cur.moodHistory.slice() : [];
+  history.push({emoji, label, ts: cur.updatedAt});
+  cur.moodHistory = history.slice(-120);
   partners[myRole] = cur;
   renderMoodBar();
   const ref = doc(db, 'couples', coupleCode);
@@ -1169,10 +1392,42 @@ function toggleActivity(num){
   const key = `activity:${num}`;
   const cur = state[key] || {checked:false, note:''};
   cur.checked = !cur.checked;
+  if(cur.checked) cur.checkedAt = Date.now();
   saveKey(key, cur);
   updateProgress();
   render();
   checkAndRevealRewards();
+}
+
+const UNLOCK_PERIOD_MS = 1000 * 60 * 60 * 24 * 30; // ~1 month per unlock wave
+
+function monthsSinceStart(){
+  if(!coupleCreatedAt) return 0;
+  return Math.max(0, Math.floor((Date.now() - coupleCreatedAt) / UNLOCK_PERIOD_MS));
+}
+
+function unlockedSectionsCount(){
+  return Math.min(SECTIONS.length, monthsSinceStart() + 1);
+}
+
+function unlockedQuestionThemesCount(){
+  return Math.min(QUESTIONS.length, (monthsSinceStart() + 1) * 2);
+}
+
+function isSectionUnlocked(sectionNum){
+  return sectionNum <= unlockedSectionsCount();
+}
+
+function sectionUnlockDate(sectionNum){
+  const waveIndex = sectionNum - 1; // section 1 unlocks at wave 0 (immediately)
+  const ts = (coupleCreatedAt || Date.now()) + waveIndex * UNLOCK_PERIOD_MS;
+  return new Date(ts).toLocaleDateString(lang==='fr' ? 'fr-FR' : 'en-US', {day:'numeric', month:'long', year:'numeric'});
+}
+
+function questionThemeUnlockDate(themeIdx){
+  const waveIndex = Math.floor(themeIdx / 2);
+  const ts = (coupleCreatedAt || Date.now()) + waveIndex * UNLOCK_PERIOD_MS;
+  return new Date(ts).toLocaleDateString(lang==='fr' ? 'fr-FR' : 'en-US', {day:'numeric', month:'long', year:'numeric'});
 }
 
 function isSectionComplete(sectionNum){
@@ -1233,7 +1488,171 @@ window.copyRewardText = copyRewardText;
 function updateNote(key, val){
   const cur = state[key] || {checked:false, note:''};
   cur.note = val;
+  cur.savedAt = Date.now();
   saveKey(key, cur);
+}
+
+function noteSourceTitle(key){
+  if(key.startsWith('activity:')){
+    const num = parseInt(key.split(':')[1], 10);
+    for(const s of SECTIONS){
+      const a = s.acts.find(act=>act[0]===num);
+      if(a) return a[1];
+    }
+    return null;
+  }
+  if(key.startsWith('answer:')){
+    const [, tIdx, qIdx] = key.split(':');
+    const theme = QUESTIONS[parseInt(tIdx,10)];
+    if(theme) return theme[1][parseInt(qIdx,10)];
+    return null;
+  }
+  return null;
+}
+
+function getJournalEntries(){
+  const entries = [];
+  for(const key in state){
+    const item = state[key];
+    if(item && typeof item.note === 'string' && item.note.trim() && item.savedAt){
+      const title = noteSourceTitle(key);
+      if(title) entries.push({key, text: item.note.trim(), title, ts: item.savedAt});
+    }
+  }
+  entries.sort((a,b)=>b.ts-a.ts);
+  return entries;
+}
+
+function monthKey(date){
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+}
+
+function isInMonth(ts, monthDate){
+  if(!ts) return false;
+  const d = new Date(ts);
+  return d.getFullYear()===monthDate.getFullYear() && d.getMonth()===monthDate.getMonth();
+}
+
+function formatMonthLabel(date){
+  return date.toLocaleDateString(lang==='fr' ? 'fr-FR' : 'en-US', {month:'long', year:'numeric'});
+}
+
+function getMonthStats(monthDate){
+  let activitiesCount = 0;
+  let notesCount = 0;
+  let featured = null;
+  for(const key in state){
+    const item = state[key];
+    if(!item) continue;
+    if(key.startsWith('activity:') && item.checked && isInMonth(item.checkedAt, monthDate)) activitiesCount++;
+    if(typeof item.note === 'string' && item.note.trim() && isInMonth(item.savedAt, monthDate)){
+      notesCount++;
+      if(!featured || item.savedAt > featured.ts){
+        const title = noteSourceTitle(key);
+        if(title) featured = {text:item.note.trim(), title, ts:item.savedAt};
+      }
+    }
+  }
+  const moodTallies = {};
+  ['A','B'].forEach(role=>{
+    const p = partners[role];
+    if(!p || !Array.isArray(p.moodHistory)) return;
+    const tally = {};
+    p.moodHistory.filter(m=>isInMonth(m.ts, monthDate)).forEach(m=>{
+      tally[m.emoji] = tally[m.emoji] || {count:0, label:m.label};
+      tally[m.emoji].count++;
+    });
+    let top = null;
+    for(const emoji in tally){
+      if(!top || tally[emoji].count > top.count) top = {emoji, count:tally[emoji].count, label:tally[emoji].label};
+    }
+    moodTallies[role] = top;
+  });
+  return {activitiesCount, notesCount, featured, moodTallies};
+}
+
+function setJournalView(view){
+  journalView = view;
+  render();
+}
+window.setJournalView = setJournalView;
+
+function journalPrevMonth(){
+  journalMonthOffset -= 1;
+  render();
+}
+window.journalPrevMonth = journalPrevMonth;
+
+function journalNextMonth(){
+  if(journalMonthOffset >= 0) return;
+  journalMonthOffset += 1;
+  render();
+}
+window.journalNextMonth = journalNextMonth;
+
+function formatEntryDate(ts){
+  return new Date(ts).toLocaleDateString(lang==='fr' ? 'fr-FR' : 'en-US', {day:'numeric', month:'long', year:'numeric'});
+}
+
+function renderJournalPanel(){
+  let html = `<section class="panel active">
+    <div class="section-head"><div class="num">${tr('bonusLabel')}</div><h2>${tr('tabJournal')}</h2></div>
+    <p class="section-intro">${tr('journalIntro')}</p>
+    <div class="gate-toggle" style="max-width:360px;margin:0 auto 24px;">
+      <button class="gate-toggle-btn ${journalView==='timeline'?'active':''}" onclick="setJournalView('timeline')" type="button">${tr('journalViewTimeline')}</button>
+      <button class="gate-toggle-btn ${journalView==='monthly'?'active':''}" onclick="setJournalView('monthly')" type="button">${tr('journalViewMonthly')}</button>
+    </div>`;
+
+  if(journalView === 'timeline'){
+    const entries = getJournalEntries();
+    if(!entries.length){
+      html += `<p class="reward-locked" style="justify-content:center;">${tr('journalEmpty')}</p>`;
+    } else {
+      entries.forEach(e=>{
+        html += `<div class="reward-card">
+          <div class="reward-kicker">${formatEntryDate(e.ts)} · ${e.title}</div>
+          <p class="reward-body">${e.text}</p>
+        </div>`;
+      });
+    }
+  } else {
+    const now = new Date();
+    const viewedMonth = new Date(now.getFullYear(), now.getMonth() + journalMonthOffset, 1);
+    const stats = getMonthStats(viewedMonth);
+    html += `<div class="mood-widget" style="max-width:100%;margin-bottom:18px;justify-content:space-between;">
+      <button class="gate-toggle-btn" onclick="journalPrevMonth()" type="button">‹ ${tr('journalPrevMonth')}</button>
+      <span class="mood-label" style="text-transform:capitalize;">${formatMonthLabel(viewedMonth)}</span>
+      <button class="gate-toggle-btn" onclick="journalNextMonth()" type="button" ${journalMonthOffset>=0?'disabled':''}>${tr('journalNextMonth')} ›</button>
+    </div>`;
+
+    if(!stats.activitiesCount && !stats.notesCount){
+      html += `<p class="reward-locked" style="justify-content:center;">${tr('journalMonthEmpty')}</p>`;
+    } else {
+      html += `<div class="reward-card unlocked">
+        <p class="reward-body">${tr('journalStatsActivities', {n: stats.activitiesCount})}<br>${tr('journalStatsNotes', {n: stats.notesCount})}</p>
+      </div>`;
+      ['A','B'].forEach(role=>{
+        const p = partners[role];
+        const top = stats.moodTallies[role];
+        if(p && top){
+          html += `<div class="reward-card">
+            <div class="reward-kicker">${p.name}</div>
+            <p class="reward-body">${tr('journalTopMood', {emoji: top.emoji, label: top.label, n: top.count})}</p>
+          </div>`;
+        }
+      });
+      if(stats.featured){
+        html += `<div class="reward-card finale unlocked">
+          <div class="reward-kicker">${tr('journalFeatured')}</div>
+          <p class="reward-title">${stats.featured.title}</p>
+          <p class="reward-body">${stats.featured.text}</p>
+        </div>`;
+      }
+    }
+  }
+
+  html += `</section>`;
+  return html;
 }
 
 function updateProgress(){
@@ -1251,10 +1670,12 @@ function renderTabs(){
   const tabs = document.getElementById('tabs');
   let html = '';
   SECTIONS.forEach(s=>{
-    html += `<button class="tab ${activeTab==='s'+s.num?'active':''}" onclick="setTab('s${s.num}')">${s.num}. ${s.title}</button>`;
+    const lockIcon = isSectionUnlocked(s.num) ? '' : '🔒 ';
+    html += `<button class="tab ${activeTab==='s'+s.num?'active':''}" onclick="setTab('s${s.num}')">${lockIcon}${s.num}. ${s.title}</button>`;
   });
   html += `<button class="tab ${activeTab==='questions'?'active':''}" onclick="setTab('questions')">${tr('tabQuestions')}</button>`;
   html += `<button class="tab ${activeTab==='rewards'?'active':''}" onclick="setTab('rewards')">${tr('tabRewards')}</button>`;
+  html += `<button class="tab ${activeTab==='journal'?'active':''}" onclick="setTab('journal')">${tr('tabJournal')}</button>`;
   tabs.innerHTML = html;
 }
 
@@ -1297,11 +1718,18 @@ function render(){
     let html = `<section class="panel active">
       <div class="section-head"><div class="num">${tr('bonusLabel')}</div><h2>${tr('tabQuestions')}</h2></div>
       <p class="section-intro">${tr('questionsIntro')}</p>`;
+    const unlockedThemes = unlockedQuestionThemesCount();
     QUESTIONS.forEach((theme, tIdx)=>{
-      html += `<div class="q-theme">${theme[0]}</div>`;
-      theme[1].forEach((q, qIdx)=>{
-        html += questionCard(tIdx, qIdx, q);
-      });
+      if(tIdx < unlockedThemes){
+        html += `<div class="q-theme">${theme[0]}</div>`;
+        theme[1].forEach((q, qIdx)=>{
+          html += questionCard(tIdx, qIdx, q);
+        });
+      } else {
+        html += `<div class="reward-card">
+          <div class="reward-locked">${tr('themeLockedTemplate', {title: theme[0], date: questionThemeUnlockDate(tIdx)})}</div>
+        </div>`;
+      }
     });
     html += `</section>`;
     panels.innerHTML = html;
@@ -1346,14 +1774,22 @@ function render(){
     }
     html += `</section>`;
     panels.innerHTML = html;
+  } else if(activeTab === 'journal'){
+    panels.innerHTML = renderJournalPanel();
   } else {
     const s = SECTIONS.find(sec => 's'+sec.num === activeTab);
     let html = `<section class="panel active">
       <div class="section-head"><div class="num">${tr('sectionLabel')} ${s.num}</div><h2>${s.title}</h2></div>
       <p class="section-intro">${s.intro}</p>`;
-    s.acts.forEach(a=>{
-      html += activityCard(a[0], a[1], a[2], a[3]);
-    });
+    if(isSectionUnlocked(s.num)){
+      s.acts.forEach(a=>{
+        html += activityCard(a[0], a[1], a[2], a[3]);
+      });
+    } else {
+      html += `<div class="reward-card">
+        <div class="reward-locked">${tr('sectionLockedTemplate', {date: sectionUnlockDate(s.num)})}</div>
+      </div>`;
+    }
     html += `</section>`;
     panels.innerHTML = html;
   }
