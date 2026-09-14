@@ -383,6 +383,24 @@ const STRINGS = {
     journalStatsNotes: "{n} note(s) écrite(s) ce mois-ci",
     journalTopMood: "Humeur la plus fréquente : {emoji} {label} ({n} fois)",
     journalFeatured: "Souvenir du mois",
+    tabDispute: "SOS Dispute 💬",
+    disputeIntro: "Un espace privé pour poser ce qui te dérange. Personne d'autre que toi ne peut le lire ici, pas même ton/ta partenaire.",
+    disputeCategoryLabel: "Qu'est-ce qui te dérange ?",
+    disputeTextPlaceholder: "Décris ce que tu ressens, en toute confidentialité...",
+    disputeSaveBtn: "Enregistrer et voir un conseil",
+    disputeAdviceTitle: "Un conseil pour toi",
+    disputeProposeBtn: "Proposer une réconciliation à {name}",
+    disputeReconciliationTitle: "Réconciliation en cours",
+    disputeReconciliationIntro: "{name} a proposé de travailler sur : « {category} ». Répondez chacun à ces trois questions, elles seront visibles par vous deux.",
+    disputeFeelingLabel: "Ce que je ressens",
+    disputeNeedLabel: "Ce dont j'ai besoin",
+    disputeGestureLabel: "Un geste que je peux faire",
+    disputeSubmitPrompts: "Enregistrer mes réponses",
+    disputeWaitingPartner: "En attente de la réponse de {name}...",
+    disputeResolveBtn: "Marquer comme résolu",
+    disputeResolvedNote: "Dernière réconciliation résolue le {date}.",
+    disputeYourAnswers: "Tes réponses",
+    disputePartnerAnswers: "Réponses de {name}",
     questionsIntro: "À utiliser lors de vos appels, dîners virtuels, ou juste comme ça, un soir de manque.",
     questionsPlaceholder: "Vos réponses...",
     notePlaceholder: "Notre note sur ce moment (optionnel)...",
@@ -465,6 +483,24 @@ const STRINGS = {
     journalStatsNotes: "{n} notes written this month",
     journalTopMood: "Most frequent mood: {emoji} {label} ({n} times)",
     journalFeatured: "Memory of the month",
+    tabDispute: "Conflict SOS 💬",
+    disputeIntro: "A private space to put into words what's bothering you. No one else can read this here, not even your partner.",
+    disputeCategoryLabel: "What's bothering you?",
+    disputeTextPlaceholder: "Describe what you're feeling, fully confidentially...",
+    disputeSaveBtn: "Save and see advice",
+    disputeAdviceTitle: "A piece of advice for you",
+    disputeProposeBtn: "Propose reconciliation to {name}",
+    disputeReconciliationTitle: "Reconciliation in progress",
+    disputeReconciliationIntro: "{name} suggested working through: \"{category}\". Each answer these three questions, they'll be visible to both of you.",
+    disputeFeelingLabel: "What I'm feeling",
+    disputeNeedLabel: "What I need",
+    disputeGestureLabel: "A gesture I can make",
+    disputeSubmitPrompts: "Save my answers",
+    disputeWaitingPartner: "Waiting for {name}'s answer...",
+    disputeResolveBtn: "Mark as resolved",
+    disputeResolvedNote: "Last reconciliation resolved on {date}.",
+    disputeYourAnswers: "Your answers",
+    disputePartnerAnswers: "{name}'s answers",
     questionsIntro: "Use these during your calls, virtual dinners, or just any evening you're missing each other.",
     questionsPlaceholder: "Your answers...",
     notePlaceholder: "Our note about this moment (optional)...",
@@ -516,6 +552,8 @@ function toggleLang(){
   REWARDS = REWARDS_ALL[lang];
   FINALE_REWARD = FINALE_REWARD_ALL[lang];
   MOODS = MOODS_ALL[lang];
+  DISPUTE_CATEGORIES = DISPUTE_CATEGORIES_ALL[lang];
+  DISPUTE_ADVICE = DISPUTE_ADVICE_ALL[lang];
   applyStaticTranslations();
   updateProgress();
   if(document.getElementById('app-content').classList.contains('visible')){
@@ -570,6 +608,42 @@ const FINALE_REWARD_ALL = {
 };
 let REWARDS = REWARDS_ALL[lang];
 let FINALE_REWARD = FINALE_REWARD_ALL[lang];
+
+const DISPUTE_CATEGORIES_ALL = {
+  fr: [
+    {id:'misunderstanding', label:"Un malentendu"},
+    {id:'lonely', label:"Je me sens seul(e) / ignoré(e)"},
+    {id:'trust', label:"Confiance / jalousie"},
+    {id:'stress', label:"Le stress qui déborde"},
+    {id:'other', label:"Autre chose"}
+  ],
+  en: [
+    {id:'misunderstanding', label:"A misunderstanding"},
+    {id:'lonely', label:"I feel lonely / ignored"},
+    {id:'trust', label:"Trust / jealousy"},
+    {id:'stress', label:"Overflowing stress"},
+    {id:'other', label:"Something else"}
+  ]
+};
+let DISPUTE_CATEGORIES = DISPUTE_CATEGORIES_ALL[lang];
+
+const DISPUTE_ADVICE_ALL = {
+  fr: {
+    misunderstanding: "Un malentendu à distance grossit vite parce qu'il manque le ton de la voix et le regard. Avant de répondre, relis le message de l'autre en imaginant qu'il/elle te le dit avec douceur, pas avec de la colère. Si le doute persiste, demande simplement : « Qu'est-ce que tu voulais dire par... ? » plutôt que de supposer le pire.",
+    lonely: "Se sentir seul(e) ou ignoré(e) à distance est l'une des blessures les plus fréquentes des couples séparés. Ce n'est pas forcément un manque d'amour de l'autre côté, souvent juste un emploi du temps différent ou une fatigue qui use la présence. Dis-le simplement, sans accuser : « J'ai eu l'impression d'être seul(e) ces derniers jours, et j'ai besoin de plus de toi. »",
+    trust: "La jalousie ou le doute à distance viennent souvent de ce qu'on ne voit pas, pas de ce qui se passe réellement. Demande-toi d'abord ce qui, concrètement, a déclenché ce sentiment aujourd'hui. Puis partage-le calmement avec ton/ta partenaire, en posant une question plutôt qu'une accusation.",
+    stress: "Le stress qui déborde vient rarement de l'autre personne, mais on le lui fait souvent payer parce qu'elle est la plus proche, même à distance. Avant d'écrire quelque chose sous le coup de la fatigue, prends cinq minutes pour respirer. Ton/ta partenaire mérite ta meilleure version, même dans un mauvais jour.",
+    other: "Chaque couple traverse des moments où quelque chose cloche sans qu'on sache exactement nommer quoi. C'est déjà un pas important d'avoir pris le temps d'écrire ce que tu ressens. La prochaine étape est d'en parler avec douceur, avant que ça grossisse."
+  },
+  en: {
+    misunderstanding: "A misunderstanding grows fast across a distance because tone of voice and facial expression are missing. Before responding, reread their message imagining it said gently, not angrily. If the doubt remains, simply ask \"What did you mean by...?\" instead of assuming the worst.",
+    lonely: "Feeling lonely or ignored from afar is one of the most common wounds for long-distance couples. It's rarely a lack of love on the other end, often just a different schedule or a tiredness that wears down presence. Say it plainly, without blame: \"I've felt alone these past few days, and I need more of you.\"",
+    trust: "Jealousy or doubt from afar often comes from what you can't see, not from what's actually happening. First ask yourself what, concretely, triggered this feeling today. Then share it calmly with your partner, as a question rather than an accusation.",
+    stress: "Overflowing stress rarely comes from your partner, but they often bear the brunt of it simply because they're the closest, even from afar. Before writing something in a tired moment, take five minutes to breathe. Your partner deserves your best self, even on a bad day.",
+    other: "Every couple goes through moments where something feels off without being able to name exactly what. Taking the time to write down what you're feeling is already an important step. The next one is talking about it gently, before it grows bigger."
+  }
+};
+let DISPUTE_ADVICE = DISPUTE_ADVICE_ALL[lang];
 
 const SECTIONS_ALL = { fr: [
   {num:1,title:"Rituels quotidiens",intro:"Ce sont les petits gestes répétés qui, jour après jour, tissent le fil invisible qui vous relie. Simples, mais essentiels.",
@@ -1655,6 +1729,144 @@ function renderJournalPanel(){
   return html;
 }
 
+let myDispute = {category:null, text:''};
+let myDisputeLoaded = false;
+
+function otherRoleOf(role){
+  return role === 'A' ? 'B' : 'A';
+}
+
+async function loadMyDisputeIfNeeded(){
+  if(myDisputeLoaded || !myRole || !coupleCode) return;
+  try{
+    const ref = doc(db, 'couples', coupleCode, 'private', myRole);
+    const snap = await getDoc(ref);
+    if(snap.exists()) myDispute = snap.data();
+    myDisputeLoaded = true;
+    if(activeTab === 'dispute') render();
+  }catch(e){ console.error('load dispute failed', e); }
+}
+
+function pickDisputeCategory(catId){
+  myDispute.category = catId;
+  render();
+}
+window.pickDisputeCategory = pickDisputeCategory;
+
+function saveDispute(){
+  const textEl = document.getElementById('disputeText');
+  myDispute.text = textEl ? textEl.value : (myDispute.text || '');
+  myDispute.createdAt = Date.now();
+  const ref = doc(db, 'couples', coupleCode, 'private', myRole);
+  setDoc(ref, myDispute).catch(e=>console.error('save dispute failed', e));
+  flashSaved();
+  render();
+}
+window.saveDispute = saveDispute;
+
+function proposeReconciliation(){
+  if(!myDispute.category) return;
+  const cat = DISPUTE_CATEGORIES.find(c=>c.id===myDispute.category);
+  const reconciliation = {
+    active: true,
+    category: myDispute.category,
+    categoryLabel: cat ? cat.label : myDispute.category,
+    initiatedBy: myRole,
+    startedAt: Date.now(),
+    prompts: {}
+  };
+  state.reconciliation = reconciliation;
+  saveKey('reconciliation', reconciliation);
+  render();
+}
+window.proposeReconciliation = proposeReconciliation;
+
+function submitReconciliationPrompts(){
+  const feeling = (document.getElementById('reconFeeling')||{}).value || '';
+  const need = (document.getElementById('reconNeed')||{}).value || '';
+  const gesture = (document.getElementById('reconGesture')||{}).value || '';
+  const reconciliation = state.reconciliation || {prompts:{}};
+  reconciliation.prompts = reconciliation.prompts || {};
+  reconciliation.prompts[myRole] = {feeling, need, gesture, submittedAt: Date.now()};
+  saveKey('reconciliation', reconciliation);
+  render();
+}
+window.submitReconciliationPrompts = submitReconciliationPrompts;
+
+function resolveReconciliation(){
+  const reconciliation = state.reconciliation || {};
+  reconciliation.active = false;
+  reconciliation.resolvedAt = Date.now();
+  saveKey('reconciliation', reconciliation);
+  render();
+}
+window.resolveReconciliation = resolveReconciliation;
+
+function renderDisputePanel(){
+  loadMyDisputeIfNeeded();
+  const other = partners[otherRoleOf(myRole)] || {};
+  let html = `<section class="panel active">
+    <div class="section-head"><div class="num">${tr('bonusLabel')}</div><h2>${tr('tabDispute')}</h2></div>
+    <p class="section-intro">${tr('disputeIntro')}</p>
+    <div class="reward-card">
+      <p class="reward-title" style="font-size:15px;">${tr('disputeCategoryLabel')}</p>
+      <div class="mood-picker" style="justify-content:flex-start;margin-bottom:14px;">`;
+  DISPUTE_CATEGORIES.forEach(cat=>{
+    html += `<button class="gate-toggle-btn ${myDispute.category===cat.id?'active':''}" style="flex:0 0 auto;" onclick="pickDisputeCategory('${cat.id}')" type="button">${cat.label}</button>`;
+  });
+  html += `</div>
+      <textarea class="note-input" id="disputeText" placeholder="${tr('disputeTextPlaceholder')}" style="min-height:80px;">${myDispute.text||''}</textarea>
+      <button class="reward-copy-btn" style="margin-top:10px;" onclick="saveDispute()" type="button">${tr('disputeSaveBtn')}</button>
+    </div>`;
+
+  if(myDispute.category){
+    html += `<div class="reward-card unlocked">
+      <div class="reward-kicker">${tr('disputeAdviceTitle')}</div>
+      <p class="reward-body">${DISPUTE_ADVICE[myDispute.category]}</p>
+      ${(!state.reconciliation || !state.reconciliation.active) ? `<button class="reward-copy-btn" style="margin-top:10px;" onclick="proposeReconciliation()" type="button">${tr('disputeProposeBtn', {name: other.name || '...'})}</button>` : ''}
+    </div>`;
+  }
+
+  const reconciliation = state.reconciliation;
+  if(reconciliation && reconciliation.active){
+    const initiator = partners[reconciliation.initiatedBy] || {};
+    const prompts = reconciliation.prompts || {};
+    const myPrompt = prompts[myRole];
+    const otherPrompt = prompts[otherRoleOf(myRole)];
+    html += `<div class="reward-card finale unlocked">
+      <div class="reward-kicker">${tr('disputeReconciliationTitle')}</div>
+      <p class="reward-body">${tr('disputeReconciliationIntro', {name: initiator.name || '...', category: reconciliation.categoryLabel || ''})}</p>`;
+    if(!myPrompt){
+      html += `
+        <p class="reward-title" style="font-size:14px;margin-top:14px;">${tr('disputeFeelingLabel')}</p>
+        <textarea class="note-input" id="reconFeeling"></textarea>
+        <p class="reward-title" style="font-size:14px;margin-top:10px;">${tr('disputeNeedLabel')}</p>
+        <textarea class="note-input" id="reconNeed"></textarea>
+        <p class="reward-title" style="font-size:14px;margin-top:10px;">${tr('disputeGestureLabel')}</p>
+        <textarea class="note-input" id="reconGesture"></textarea>
+        <button class="reward-copy-btn" style="margin-top:10px;" onclick="submitReconciliationPrompts()" type="button">${tr('disputeSubmitPrompts')}</button>`;
+    } else {
+      html += `
+        <p class="reward-title" style="font-size:14px;margin-top:14px;">${tr('disputeYourAnswers')}</p>
+        <p class="reward-body">${tr('disputeFeelingLabel')} : ${myPrompt.feeling}<br>${tr('disputeNeedLabel')} : ${myPrompt.need}<br>${tr('disputeGestureLabel')} : ${myPrompt.gesture}</p>`;
+      if(otherPrompt){
+        html += `
+        <p class="reward-title" style="font-size:14px;margin-top:14px;">${tr('disputePartnerAnswers', {name: other.name || '...'})}</p>
+        <p class="reward-body">${tr('disputeFeelingLabel')} : ${otherPrompt.feeling}<br>${tr('disputeNeedLabel')} : ${otherPrompt.need}<br>${tr('disputeGestureLabel')} : ${otherPrompt.gesture}</p>
+        <button class="reward-copy-btn" style="margin-top:10px;" onclick="resolveReconciliation()" type="button">${tr('disputeResolveBtn')}</button>`;
+      } else {
+        html += `<p class="reward-locked" style="margin-top:14px;">${tr('disputeWaitingPartner', {name: other.name || '...'})}</p>`;
+      }
+    }
+    html += `</div>`;
+  } else if(reconciliation && reconciliation.resolvedAt){
+    html += `<p class="reward-locked" style="justify-content:center;">${tr('disputeResolvedNote', {date: formatEntryDate(reconciliation.resolvedAt)})}</p>`;
+  }
+
+  html += `</section>`;
+  return html;
+}
+
 function updateProgress(){
   let done = 0;
   for(let i=1;i<=101;i++){
@@ -1676,6 +1888,7 @@ function renderTabs(){
   html += `<button class="tab ${activeTab==='questions'?'active':''}" onclick="setTab('questions')">${tr('tabQuestions')}</button>`;
   html += `<button class="tab ${activeTab==='rewards'?'active':''}" onclick="setTab('rewards')">${tr('tabRewards')}</button>`;
   html += `<button class="tab ${activeTab==='journal'?'active':''}" onclick="setTab('journal')">${tr('tabJournal')}</button>`;
+  html += `<button class="tab ${activeTab==='dispute'?'active':''}" onclick="setTab('dispute')">${tr('tabDispute')}</button>`;
   tabs.innerHTML = html;
 }
 
@@ -1776,6 +1989,8 @@ function render(){
     panels.innerHTML = html;
   } else if(activeTab === 'journal'){
     panels.innerHTML = renderJournalPanel();
+  } else if(activeTab === 'dispute'){
+    panels.innerHTML = renderDisputePanel();
   } else {
     const s = SECTIONS.find(sec => 's'+sec.num === activeTab);
     let html = `<section class="panel active">

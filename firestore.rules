@@ -19,6 +19,19 @@ service cloud.firestore {
                       request.resource.data.diff(resource.data).affectedKeys()
                         .hasOnly(['state', 'partners', 'updatedAt']);
       allow delete: if false;
+
+      match /private/{role} {
+        // A role's private space (dispute venting) can only ever be read or written by
+        // whoever is signed in as the exact email matching that role — never by the other partner.
+        function ownsRole() {
+          let sub = get(/databases/$(database)/documents/couples/$(code)).data.subscription;
+          return request.auth != null && request.auth.token.email != null &&
+            ((role == 'A' && request.auth.token.email.lower() == sub.email) ||
+             (role == 'B' && request.auth.token.email.lower() == sub.partnerEmail));
+        }
+        allow get, create, update: if ownsRole();
+        allow list, delete: if false;
+      }
     }
 
     match /emailToCode/{email} {
