@@ -1,0 +1,11 @@
+{
+  "name": "malgre-la-distance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Malgré la distance — espace de couple longue distance avec abonnement, code unique et humeur partagée.",
+  "dependencies": {
+    "stripe": "^17.4.0",
+    "resend": "^4.0.1",
+    "firebase-admin": "^12.7.0"
+  }
+}

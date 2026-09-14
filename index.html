@@ -4,25 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Malgré la distance</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%9E%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --bg: #1a2038;
-    --bg-deep: #12172b;
-    --card: #232b4a;
-    --card-border: #333d63;
-    --gold: #e3b23c;
+    --bg: #2b0f1a;
+    --bg-deep: #1c0810;
+    --card: #3a1420;
+    --card-border: #5c2436;
+    --gold: #d9a441;
     --gold-soft: #f0cf7f;
-    --rose: #e79aad;
-    --text: #f2eee3;
-    --text-dim: #a7afce;
-    --line: #38406a;
+    --rose: #ff8fa3;
+    --rose-deep: #c94f68;
+    --blush: #f6d9cf;
+    --text: #fbeee8;
+    --text-dim: #d9b3bb;
+    --line: #5c2436;
     --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --script: 'Segoe Script', 'Brush Script MT', var(--serif);
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background: radial-gradient(ellipse at 20% -10%, #2a3560 0%, var(--bg) 45%, var(--bg-deep) 100%);
+    background: radial-gradient(ellipse at 20% -10%, #5a1d33 0%, var(--bg) 45%, var(--bg-deep) 100%);
     background-color: var(--bg);
     color: var(--text);
     font-family: var(--sans);
@@ -30,10 +34,22 @@
     position:relative;
     overflow-x:hidden;
   }
-  #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
-  .star{position:absolute;background:#fff;border-radius:50%;opacity:.5;animation:twinkle 4s ease-in-out infinite;}
-  @keyframes twinkle{0%,100%{opacity:.15;}50%{opacity:.8;}}
-  @media (prefers-reduced-motion: reduce){ .star{animation:none;opacity:.35;} }
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .star{position:absolute;opacity:.6;animation:floatUp linear infinite;}
+  @keyframes floatUp{
+    0%{transform:translateY(0) rotate(0deg);opacity:0;}
+    10%{opacity:.7;}
+    90%{opacity:.5;}
+    100%{transform:translateY(-110vh) rotate(20deg);opacity:0;}
+  }
+  @media (prefers-reduced-motion: reduce){ .star{animation:none;opacity:.25;} }
+
+  #confetti{position:fixed;inset:0;z-index:30;pointer-events:none;overflow:hidden;}
+  .confetti-heart{position:absolute;top:-10%;font-size:20px;animation:confettiFall linear forwards;}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(115vh) rotate(360deg);opacity:.9;}
+  }
 
   .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:28px 20px 80px;}
 
@@ -87,7 +103,6 @@
   .card-title.done{text-decoration:line-through;color:var(--text-dim);}
   .card-desc{font-size:13.8px;line-height:1.55;color:var(--text-dim);margin:0 0 8px;}
   .card-tip{font-size:12.5px;font-style:italic;color:var(--rose);margin:0 0 10px;}
-  .card-tip b{font-style:normal;font-weight:600;}
   .note-input{
     width:100%;background:var(--bg-deep);border:1px solid var(--line);border-radius:6px;color:var(--text);
     font-family:var(--sans);font-size:13px;padding:8px 10px;resize:vertical;min-height:34px;
@@ -137,55 +152,135 @@
   #app-content{display:none;}
   #app-content.visible{display:block;}
 
+  .heart-mark{font-size:34px;margin-bottom:6px;filter:drop-shadow(0 0 10px rgba(255,143,163,.5));}
+  .gate-toggle{display:flex;gap:6px;background:var(--bg-deep);border:1px solid var(--card-border);border-radius:999px;padding:4px;margin-bottom:18px;}
+  .gate-toggle-btn{flex:1;padding:8px 10px;border-radius:999px;border:none;background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;font-family:var(--sans);transition:all .15s ease;}
+  .gate-toggle-btn.active{background:var(--rose-deep);color:#fff;font-weight:600;}
+  #gateSubscribe.hidden, #gateLogin.hidden{display:none;}
+  .gate-sub-text{color:var(--text-dim);font-size:13px;line-height:1.6;margin-bottom:16px;text-align:left;}
+  .gate-note{color:var(--text-dim);font-size:11.5px;font-style:italic;line-height:1.5;margin-top:12px;text-align:left;}
+  .gate-banner{background:rgba(217,164,65,.15);border:1px solid var(--gold);color:var(--gold-soft);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;text-align:left;line-height:1.5;}
+
+  /* Mood widget */
+  .mood-widget{display:flex;align-items:stretch;gap:10px;background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;margin:20px auto 0;max-width:520px;}
+  .mood-side{flex:1;min-width:0;text-align:center;}
+  .mood-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);margin-bottom:8px;}
+  .mood-picker{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
+  .mood-btn{background:var(--bg-deep);border:1px solid var(--line);border-radius:8px;font-size:16px;padding:4px 6px;cursor:pointer;transition:all .15s ease;line-height:1;}
+  .mood-btn:hover{border-color:var(--rose);}
+  .mood-btn.active{background:var(--rose-deep);border-color:var(--rose);}
+  .mood-divider{flex:0 0 auto;display:flex;align-items:center;font-size:18px;opacity:.8;}
+  .mood-display{font-size:26px;line-height:1;}
+  .mood-display-label{display:block;font-size:11.5px;color:var(--text-dim);margin-top:6px;font-style:italic;}
+  .mood-empty{color:var(--text-dim);font-size:12px;font-style:italic;}
+  .mood-name{color:var(--gold-soft) !important;}
+
+  /* Rewards */
+  .reward-card{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:18px 20px;margin-bottom:14px;position:relative;}
+  .reward-card.unlocked{border-color:var(--gold);background:linear-gradient(145deg,var(--card),rgba(217,164,65,.08));}
+  .reward-card.finale.unlocked{border-color:var(--rose);background:linear-gradient(145deg,var(--card),rgba(255,143,163,.12));}
+  .reward-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--rose);margin-bottom:6px;}
+  .reward-title{font-family:var(--serif);font-size:19px;color:var(--gold-soft);margin:0 0 8px;}
+  .reward-body{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-line;}
+  .reward-locked{color:var(--text-dim);font-size:13.5px;font-style:italic;display:flex;align-items:center;gap:8px;}
+  .reward-copy-btn{margin-top:12px;background:transparent;border:1px solid var(--gold);color:var(--gold-soft);border-radius:6px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-family:var(--sans);}
+  .reward-copy-btn:hover{background:var(--gold);color:#2b0f1a;}
+  .certificate{border:2px solid var(--gold);border-radius:14px;padding:26px 20px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(217,164,65,.15),transparent 70%);}
+  .certificate .names{font-family:var(--serif);font-size:24px;color:var(--gold-soft);margin:10px 0;}
+  .certificate .date{color:var(--text-dim);font-size:12.5px;font-style:italic;}
+
+  /* Reward reveal modal */
+  #rewardModal{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;background:rgba(28,8,16,.82);padding:20px;}
+  #rewardModal.hidden{display:none;}
+  .reward-modal-box{max-width:420px;width:100%;background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:28px 24px;text-align:center;animation:popIn .3s ease;}
+  @keyframes popIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+  .reward-modal-box .big-emoji{font-size:38px;margin-bottom:10px;}
+  .reward-modal-box h3{font-family:var(--serif);color:var(--gold-soft);font-size:21px;margin:0 0 10px;}
+  .reward-modal-box p{font-size:13.5px;line-height:1.6;color:var(--text-dim);margin-bottom:18px;}
+  .reward-modal-close{background:var(--gold);color:#2b0f1a;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+
+  .lang-toggle{position:fixed;top:14px;right:14px;z-index:40;background:var(--card);border:1px solid var(--gold);color:var(--gold-soft);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--sans);letter-spacing:.03em;}
+  .lang-toggle:hover{background:var(--gold);color:#2b0f1a;}
+
   @media (max-width:520px){
     h1{font-size:30px;}
     .wrap{padding:20px 14px 70px;}
+    .mood-widget{flex-direction:column;}
+    .mood-divider{justify-content:center;}
   }
 </style>
 </head>
 <body>
+<button class="lang-toggle" id="langToggle" onclick="toggleLang()" type="button">EN</button>
 <div id="stars"></div>
 
 <div id="gate">
   <div class="gate-box">
-    <div class="kicker" style="margin-bottom:14px;">Édition longue distance</div>
-    <h1>Malgré la distance</h1>
-    <p>Entrez le code reçu par email après votre achat pour accéder à votre espace de couple, privé et partagé entre vous deux.</p>
-    <input type="text" id="gateInput" class="gate-input" placeholder="VOTRE CODE" autocomplete="off">
-    <button class="gate-btn" onclick="submitCode()">Accéder à notre espace</button>
-    <div class="gate-error" id="gateError"></div>
+    <div class="heart-mark">💞</div>
+    <div class="kicker" style="margin-bottom:14px;" data-i18n="kicker">Édition longue distance</div>
+    <h1 data-i18n="heroTitle">Malgré la distance</h1>
+    <div id="gateBanner"></div>
+
+    <div class="gate-toggle">
+      <button class="gate-toggle-btn active" id="gtLogin" onclick="showGateMode('login')" type="button" data-i18n="gtLoginLabel">J'ai un code</button>
+      <button class="gate-toggle-btn" id="gtSub" onclick="showGateMode('subscribe')" type="button" data-i18n="gtSubLabel">Je n'ai pas de code</button>
+    </div>
+
+    <div id="gateLogin">
+      <p data-i18n="gateLoginIntro">Entrez le code reçu par email après votre abonnement pour accéder à votre espace de couple, privé et partagé entre vous deux.</p>
+      <input type="text" id="gateInput" class="gate-input" placeholder="VOTRE CODE" data-i18n-placeholder="gateInputPlaceholder" autocomplete="off">
+      <button class="gate-btn" onclick="submitCode()" type="button" data-i18n="gateBtnAccess">Accéder à notre espace</button>
+      <div class="gate-error" id="gateError"></div>
+    </div>
+
+    <div id="gateSubscribe" class="hidden">
+      <p class="gate-sub-text" data-i18n-html="subIntro">Abonnez-vous pour recevoir par email <b>votre code unique de couple</b>. Ce code n'est fait que pour vous deux : partagez-le avec une seule personne, votre partenaire. Si un jour vous souhaitez rejouer avec quelqu'un d'autre, un nouvel abonnement vous donnera un tout nouveau code. L'ancien restera l'histoire de votre couple d'avant.</p>
+      <input type="text" id="subYourName" class="gate-input" style="text-transform:none;" placeholder="TON PRÉNOM" data-i18n-placeholder="subYourNamePlaceholder" autocomplete="off">
+      <input type="email" id="subEmail" class="gate-input" style="text-transform:none;" placeholder="VOTRE EMAIL" data-i18n-placeholder="subEmailPlaceholder" autocomplete="off">
+      <input type="text" id="subPartnerName" class="gate-input" style="text-transform:none;" placeholder="PRÉNOM DE TON/TA PARTENAIRE" data-i18n-placeholder="subPartnerNamePlaceholder" autocomplete="off">
+      <input type="email" id="subPartnerEmail" class="gate-input" style="text-transform:none;" placeholder="EMAIL DE VOTRE PARTENAIRE (optionnel)" data-i18n-placeholder="subPartnerPlaceholder" autocomplete="off">
+      <button class="gate-btn" id="subBtn" onclick="startSubscription()" type="button" data-i18n="subBtn">S'abonner et recevoir mon code</button>
+      <div class="gate-error" id="subError"></div>
+      <p class="gate-note" data-i18n="subNote">Le paiement est sécurisé par Stripe. Vous recevrez votre code par email dans les minutes qui suivent.</p>
+    </div>
   </div>
 </div>
+<div id="rewardModal" class="hidden">
+  <div class="reward-modal-box" id="rewardModalBox"></div>
+</div>
+<div id="confetti"></div>
 
 <div class="wrap" id="app-content">
   <header class="hero">
     <svg class="constellation" viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
-      <line x1="30" y1="45" x2="190" y2="25" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3,4" opacity="0.6"/>
-      <circle cx="30" cy="45" r="5" fill="var(--rose)"/>
+      <path d="M30 45 C 10 25, 45 5, 60 25 C 75 5, 110 25, 90 45 L 60 65 Z" fill="none" stroke="var(--rose)" stroke-width="1.4" opacity="0.7" transform="translate(0,0) scale(0.8)"/>
+      <line x1="60" y1="45" x2="190" y2="25" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3,4" opacity="0.6"/>
+      <circle cx="60" cy="45" r="5" fill="var(--rose)"/>
       <circle cx="190" cy="25" r="5" fill="var(--gold)"/>
-      <circle cx="80" cy="38" r="1.6" fill="var(--text-dim)"/>
-      <circle cx="120" cy="33" r="1.6" fill="var(--text-dim)"/>
-      <circle cx="150" cy="29" r="1.6" fill="var(--text-dim)"/>
+      <circle cx="110" cy="38" r="1.6" fill="var(--text-dim)"/>
+      <circle cx="140" cy="33" r="1.6" fill="var(--text-dim)"/>
+      <circle cx="165" cy="29" r="1.6" fill="var(--text-dim)"/>
     </svg>
-    <div class="kicker">Édition longue distance</div>
-    <h1>Malgré la distance</h1>
-    <p class="subtitle">101 façons de rester cœur à cœur</p>
+    <div class="kicker" data-i18n="kicker">Édition longue distance</div>
+    <h1 data-i18n="heroTitle">Malgré la distance</h1>
+    <p class="subtitle" data-i18n="subtitle">101 façons de rester cœur à cœur</p>
     <div class="progress-wrap">
       <div class="progress-label"><span id="prog-text">0 / 101 réalisées</span><span id="prog-pct">0%</span></div>
       <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
     </div>
+    <div id="moodBar"></div>
   </header>
 
   <nav class="tabs" id="tabs"></nav>
   <div id="panels"></div>
 
-  <footer>Malgré la distance, vous êtes ensemble.</footer>
+  <footer data-i18n="footer">Malgré la distance, vous êtes ensemble.</footer>
 </div>
-<div class="save-note" id="saveNote">Enregistré ✓</div>
+<div class="save-note" id="saveNote" data-i18n="savedLabel">Enregistré ✓</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDeUetg4Wg6x91ptRQEcWQaqWWVRSSDBAI",
@@ -199,8 +294,228 @@ const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
 
 let coupleCode = null;
+let myRole = null; // 'A' or 'B'
+let unsubscribeSnapshot = null;
+let partners = {};
 
-const SECTIONS = [
+let lang = localStorage.getItem('lang') || ((navigator.language||'').toLowerCase().startsWith('en') ? 'en' : 'fr');
+
+const STRINGS = {
+  fr: {
+    kicker: "Édition longue distance",
+    heroTitle: "Malgré la distance",
+    subtitle: "101 façons de rester cœur à cœur",
+    footer: "Malgré la distance, vous êtes ensemble.",
+    savedLabel: "Enregistré ✓",
+    copiedLabel: "Copié ✓",
+    gtLoginLabel: "J'ai un code",
+    gtSubLabel: "Je n'ai pas de code",
+    gateLoginIntro: "Entrez le code reçu par email après votre abonnement pour accéder à votre espace de couple, privé et partagé entre vous deux.",
+    gateInputPlaceholder: "VOTRE CODE",
+    gateBtnAccess: "Accéder à notre espace",
+    gateErrorEmpty: "Merci d'entrer votre code.",
+    gateLoading: "Chargement de votre espace...",
+    gateErrorNotFound: "Ce code est introuvable. Vérifiez l'email reçu, ou abonnez-vous pour en recevoir un.",
+    gateErrorCanceled: "Cet abonnement n'est plus actif. Réabonnez-vous pour recevoir un nouveau code.",
+    gateErrorGeneric: "Une erreur est survenue. Vérifiez votre connexion et réessayez.",
+    subIntro: "Abonnez-vous pour recevoir par email <b>votre code unique de couple</b>. Ce code est nominatif : il n'appartient qu'à toi et à la personne dont tu donnes le prénom ci-dessous. Si tu veux jouer avec quelqu'un d'autre, un nouvel abonnement te donnera un autre code, propre à cette nouvelle histoire.",
+    subYourNamePlaceholder: "TON PRÉNOM",
+    subEmailPlaceholder: "VOTRE EMAIL",
+    subPartnerNamePlaceholder: "PRÉNOM DE TON/TA PARTENAIRE",
+    subPartnerPlaceholder: "EMAIL DE VOTRE PARTENAIRE (optionnel)",
+    subBtn: "S'abonner et recevoir mon code",
+    subBtnLoading: "Redirection vers le paiement...",
+    subNote: "Le paiement est sécurisé par Stripe. Vous recevrez votre code par email dans les minutes qui suivent.",
+    subErrorEmail: "Merci d'entrer un email valide.",
+    subErrorNames: "Merci d'indiquer ton prénom et celui de ton/ta partenaire.",
+    whoAreYouTitle: "Qui es-tu ?",
+    subErrorGeneric: "Impossible de démarrer le paiement pour le moment. Réessayez dans un instant.",
+    bannerSubscribed1: "Merci pour votre abonnement 💛 Vérifiez votre boîte mail (et vos spams) : votre code unique de couple arrive dans quelques minutes.",
+    bannerSubscribed0: "Le paiement a été annulé. Vous pouvez réessayer quand vous voulez.",
+    promptFirstName: "Bienvenue ! Quel est ton prénom ?",
+    promptSecondName: "Bienvenue ! {name} t'attend. Quel est ton prénom ?",
+    defaultName: "Moi",
+    progressText: "{done} / 101 réalisées",
+    moodYours: "Ton humeur",
+    moodOf: "Humeur de",
+    moodUnknown: "...",
+    moodNotSet: "Pas encore renseignée",
+    moodWaiting: "En attente de ton/ta partenaire...",
+    timeJustNow: "à l'instant",
+    timeMinAgo: "il y a {n} min",
+    timeHAgo: "il y a {n} h",
+    timeDAgo: "il y a {n} j",
+    tabQuestions: "Questions de couple",
+    tabRewards: "Nos cadeaux 🎁",
+    questionsIntro: "À utiliser lors de vos appels, dîners virtuels, ou juste comme ça, un soir de manque.",
+    questionsPlaceholder: "Vos réponses...",
+    notePlaceholder: "Notre note sur ce moment (optionnel)...",
+    rewardsIntro: "Chaque section terminée débloque un petit cadeau : un conseil, une recommandation, une lettre, un guide de réconciliation. Terminez les 101 activités pour débloquer votre récompense finale.",
+    rewardLockedTemplate: "🔒 Débloqué après avoir terminé la section « {title} »",
+    rewardCopyBtn: "Copier le texte",
+    rewardFinaleLocked: "🔒 Votre certificat final s'affichera ici quand les 101 activités seront terminées.",
+    rewardsHeading: "Nos cadeaux",
+    certificateKicker: "Certificat d'amour à distance",
+    certificateSubtitle: "101 activités réalisées ensemble",
+    modalTitleSection: "Une récompense vous attend",
+    modalTitleFinale: "Félicitations !",
+    modalBodyFinale: "Vous avez terminé les 101 activités ! Rendez-vous dans l'onglet « Nos cadeaux » pour découvrir votre certificat.",
+    modalBodySectionTemplate: "Vous venez de terminer une section. Une {type} vient d'être débloquée dans l'onglet « Nos cadeaux ».",
+    modalClose: "Voir dans Nos cadeaux",
+    sectionLabel: "Section",
+    bonusLabel: "Bonus"
+  },
+  en: {
+    kicker: "Long-distance edition",
+    heroTitle: "Despite the Distance",
+    subtitle: "101 ways to stay heart to heart",
+    footer: "Despite the distance, you are together.",
+    savedLabel: "Saved ✓",
+    copiedLabel: "Copied ✓",
+    gtLoginLabel: "I have a code",
+    gtSubLabel: "I don't have a code",
+    gateLoginIntro: "Enter the code you received by email after subscribing to access your private couple space, shared between you two.",
+    gateInputPlaceholder: "YOUR CODE",
+    gateBtnAccess: "Enter our space",
+    gateErrorEmpty: "Please enter your code.",
+    gateLoading: "Loading your space...",
+    gateErrorNotFound: "This code wasn't found. Check the email you received, or subscribe to get one.",
+    gateErrorCanceled: "This subscription is no longer active. Subscribe again to receive a new code.",
+    gateErrorGeneric: "Something went wrong. Check your connection and try again.",
+    subIntro: "Subscribe to receive <b>your unique couple code</b> by email. This code is tied to your name and the name of the partner you enter below. If you ever want to play with someone else, a new subscription will give you a different code for that new story.",
+    subYourNamePlaceholder: "YOUR FIRST NAME",
+    subEmailPlaceholder: "YOUR EMAIL",
+    subPartnerNamePlaceholder: "YOUR PARTNER'S FIRST NAME",
+    subPartnerPlaceholder: "YOUR PARTNER'S EMAIL (optional)",
+    subBtn: "Subscribe and get my code",
+    subBtnLoading: "Redirecting to payment...",
+    subNote: "Payment is secured by Stripe. You'll receive your code by email within minutes.",
+    subErrorEmail: "Please enter a valid email.",
+    subErrorNames: "Please enter your first name and your partner's first name.",
+    whoAreYouTitle: "Who are you?",
+    subErrorGeneric: "Couldn't start the payment right now. Please try again in a moment.",
+    bannerSubscribed1: "Thank you for subscribing 💛 Check your inbox (and spam folder): your unique couple code is arriving within minutes.",
+    bannerSubscribed0: "Payment was canceled. You can try again anytime.",
+    promptFirstName: "Welcome! What's your first name?",
+    promptSecondName: "Welcome! {name} is waiting for you. What's your first name?",
+    defaultName: "Me",
+    progressText: "{done} / 101 completed",
+    moodYours: "Your mood",
+    moodOf: "Mood of",
+    moodUnknown: "...",
+    moodNotSet: "Not set yet",
+    moodWaiting: "Waiting for your partner...",
+    timeJustNow: "just now",
+    timeMinAgo: "{n} min ago",
+    timeHAgo: "{n} h ago",
+    timeDAgo: "{n} d ago",
+    tabQuestions: "Couple questions",
+    tabRewards: "Our gifts 🎁",
+    questionsIntro: "Use these during your calls, virtual dinners, or just any evening you're missing each other.",
+    questionsPlaceholder: "Your answers...",
+    notePlaceholder: "Our note about this moment (optional)...",
+    rewardsIntro: "Every completed section unlocks a small gift: advice, a recommendation, a letter, a reconciliation guide. Finish all 101 activities to unlock your final reward.",
+    rewardLockedTemplate: "🔒 Unlocked after completing the \"{title}\" section",
+    rewardCopyBtn: "Copy text",
+    rewardFinaleLocked: "🔒 Your final certificate will appear here once all 101 activities are completed.",
+    certificateKicker: "Long-distance love certificate",
+    certificateSubtitle: "101 activities completed together",
+    modalTitleSection: "A reward awaits you",
+    modalTitleFinale: "Congratulations!",
+    rewardsHeading: "Our gifts",
+    modalBodyFinale: "You've completed all 101 activities! Head to the \"Our gifts\" tab to discover your certificate.",
+    modalBodySectionTemplate: "You just completed a section. A {type} has been unlocked in the \"Our gifts\" tab.",
+    modalClose: "View in Our Gifts",
+    sectionLabel: "Section",
+    bonusLabel: "Bonus"
+  }
+};
+
+function tr(key, vars){
+  let s = STRINGS[lang][key] || STRINGS.fr[key] || key;
+  if(vars) for(const k in vars) s = s.replace(`{${k}}`, vars[k]);
+  return s;
+}
+
+function applyStaticTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    el.textContent = tr(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    el.innerHTML = tr(el.getAttribute('data-i18n-html'));
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.placeholder = tr(el.getAttribute('data-i18n-placeholder'));
+  });
+  document.getElementById('langToggle').textContent = lang === 'fr' ? 'EN' : 'FR';
+  document.documentElement.lang = lang;
+  document.title = tr('heroTitle');
+}
+
+function toggleLang(){
+  lang = lang === 'fr' ? 'en' : 'fr';
+  localStorage.setItem('lang', lang);
+  SECTIONS = SECTIONS_ALL[lang];
+  QUESTIONS = QUESTIONS_ALL[lang];
+  REWARDS = REWARDS_ALL[lang];
+  FINALE_REWARD = FINALE_REWARD_ALL[lang];
+  MOODS = MOODS_ALL[lang];
+  applyStaticTranslations();
+  updateProgress();
+  if(document.getElementById('app-content').classList.contains('visible')){
+    renderMoodBar();
+    render();
+  }
+}
+window.toggleLang = toggleLang;
+
+const MOODS_ALL = {
+  fr: [
+    {e:'🥰', l:"Amoureux·se"},
+    {e:'😊', l:"Bien"},
+    {e:'😌', l:"Apaisé·e"},
+    {e:'🤩', l:"Excité·e"},
+    {e:'😴', l:"Fatigué·e"},
+    {e:'😔', l:"Un peu triste"},
+    {e:'😤', l:"Stressé·e"},
+    {e:'🥺', l:"Tu me manques"}
+  ],
+  en: [
+    {e:'🥰', l:"In love"},
+    {e:'😊', l:"Good"},
+    {e:'😌', l:"At peace"},
+    {e:'🤩', l:"Excited"},
+    {e:'😴', l:"Tired"},
+    {e:'😔', l:"A bit sad"},
+    {e:'😤', l:"Stressed"},
+    {e:'🥺', l:"Missing you"}
+  ]
+};
+let MOODS = MOODS_ALL[lang];
+
+const REWARDS_ALL = { fr: {
+  1: {type:"Conseil", title:"Un conseil pour vous deux", body:"Les rituels sont la colle invisible d'un couple à distance. Le conseil que nous vous offrons : ne laissez jamais un rituel devenir une corvée. Le jour où l'un de vous n'a pas envie, dites-le simplement, un rituel sauté par honnêteté vaut mieux qu'un rituel fait par obligation. La régularité compte plus que la perfection."},
+  2: {type:"Recommandation", title:"Une recommandation rien que pour vous", body:"Vous avez pris l'habitude de vous retrouver malgré l'écran. Notre recommandation : une fois par mois, transformez un de ces rendez-vous en « vraie » soirée. Habillez-vous comme si vous sortiez, mettez la table, éteignez les autres écrans. Le rituel devient un rendez-vous, pas une habitude."},
+  3: {type:"Lettre", title:"Une lettre à lui offrir", body:"Mon amour,\n\nIl y a des mots que je n'ose pas toujours dire à voix haute, alors je les écris.\n\n[Complète ici : ce que tu admires le plus chez lui/elle en ce moment]\n\nMerci d'être là, même loin. Merci de choisir cette distance avec moi, chaque jour, sans jamais me laisser douter de nous.\n\nJe t'aime,\n[ton prénom]", copyable:true},
+  4: {type:"Recommandation", title:"Une idée de cadeau à retenir", body:"Le prochain cadeau qui marquera le plus n'est pas le plus cher : c'est celui qui prouve que vous écoutez vraiment. Notre recommandation : notez, dans les 7 prochains jours, la première chose que votre partenaire mentionne vouloir sans le dire directement, puis surprenez-le/la avec, dans un mois."},
+  5: {type:"Conseil", title:"Un conseil pour l'approche des retrouvailles", body:"Plus les retrouvailles approchent, plus la pression du « tout doit être parfait » grandit, et c'est souvent elle qui gâche le moment. Notre conseil : prévoyez un jour de réadaptation, sans plan, juste après vos retrouvailles. Se retrouver, physiquement, redemande un peu de temps, même quand on s'aime très fort."},
+  6: {type:"Réconciliation", title:"Un guide de réconciliation à distance", body:"La distance amplifie les malentendus : un silence ou un ton mal interprété ne peut pas être corrigé par un regard ou une main tenue. En cas de dispute à distance :\n\n1. Ne raccrochez jamais fâché·e sans avoir fixé un moment pour en reparler.\n2. Reformulez ce que vous avez compris avant de répondre : « Ce que j'entends, c'est que... ».\n3. Privilégiez la voix ou la vidéo au texte pour désamorcer un conflit, car l'écrit durcit les tons.\n4. Terminez toujours l'échange par un geste tendre, même petit."}
+}, en: {
+  1: {type:"Advice", title:"A piece of advice for you two", body:"Rituals are the invisible glue of a long-distance couple. Our advice: never let a ritual become a chore. The day one of you isn't feeling it, just say so. A skipped ritual done honestly beats one done out of obligation. Consistency matters more than perfection."},
+  2: {type:"Recommendation", title:"A recommendation just for you", body:"You've built the habit of meeting despite the screen. Our recommendation: once a month, turn one of these dates into a \"real\" evening. Dress up as if you were going out, set the table, turn off every other screen. The habit becomes a date again, not just a routine."},
+  3: {type:"Letter", title:"A letter to give them", body:"My love,\n\nThere are words I don't always dare say out loud, so I'm writing them instead.\n\n[Fill in: what you admire most about them right now]\n\nThank you for being there, even from afar. Thank you for choosing this distance with me, every day, without ever letting me doubt us.\n\nI love you,\n[your name]", copyable:true},
+  4: {type:"Recommendation", title:"A gift idea to remember", body:"The next gift that will mean the most isn't the most expensive one: it's the one that proves you're really listening. Our recommendation: over the next 7 days, note the first thing your partner mentions wanting without saying it directly, then surprise them with it a month from now."},
+  5: {type:"Advice", title:"Advice for the run-up to your reunion", body:"The closer a reunion gets, the more the pressure of \"everything has to be perfect\" grows, and it's often that pressure that spoils the moment. Our advice: plan a \"re-adjustment\" day, with no plans at all, right after your reunion. Reconnecting in person takes a little time to settle into, even when you love each other very much."},
+  6: {type:"Reconciliation", title:"A guide to reconciling from afar", body:"Distance amplifies misunderstandings: a silence or a misread tone can't be fixed with a look or a held hand. In case of a long-distance argument:\n\n1. Never hang up angry without setting a time to talk again.\n2. Reflect back what you understood before responding: \"What I'm hearing is...\".\n3. Prefer voice or video over text to defuse a conflict, since writing tends to harden tone.\n4. Always end the exchange with a tender gesture, even a small one."}
+}};
+const FINALE_REWARD_ALL = {
+  fr: {type:"Récompense finale", title:"Votre certificat d'amour", body:"Vous avez traversé les 101 pas de ce chemin, ensemble, malgré la distance. Peu de couples vont jusqu'au bout, et vous, vous l'avez fait. Gardez ce certificat comme une preuve, pour les jours où le doute reviendrait : vous avez déjà prouvé, activité après activité, que cette distance ne vous fait pas peur."},
+  en: {type:"Final reward", title:"Your certificate of love", body:"You've made it through all 101 steps of this journey, together, despite the distance. Few couples make it all the way, and you did. Keep this certificate as proof, for the days doubt creeps back in: you've already proven, activity after activity, that this distance doesn't scare you."}
+};
+let REWARDS = REWARDS_ALL[lang];
+let FINALE_REWARD = FINALE_REWARD_ALL[lang];
+
+const SECTIONS_ALL = { fr: [
   {num:1,title:"Rituels quotidiens",intro:"Ce sont les petits gestes répétés qui, jour après jour, tissent le fil invisible qui vous relie. Simples, mais essentiels.",
    acts:[
     [1,"Le café du matin partagé","Envoyez-vous une photo de votre premier café (ou thé) de la journée.","Créez un album partagé rien que pour ces photos."],
@@ -320,9 +635,130 @@ const SECTIONS = [
     [100,"Pourquoi ça vaut la peine","Rappelez-vous mutuellement pourquoi cette distance vaut la peine.","Gardez une trace écrite de cette conversation."],
     [101,"La promesse commune","Écrivez-vous une promesse commune pour tenir jusqu'aux retrouvailles.","Signez-la tous les deux, même symboliquement."]
    ]}
-];
+], en: [
+  {num:1,title:"Daily rituals",intro:"These are the small repeated gestures that, day after day, weave the invisible thread connecting you. Simple, but essential.",
+   acts:[
+    [1,"The shared morning coffee","Send each other a photo of your first coffee (or tea) of the day.","Create a shared album just for these photos."],
+    [2,"The secret password","Every night, say a made-up word or phrase to each other, just between you two, before hanging up.","Change it every month to keep the magic alive."],
+    [3,"The same sky","Watch the same sunrise or sunset at the same moment, even if your local times differ.","Each take a photo and compare them."],
+    [4,"The morning voice note","Send a 30-second voice note every morning so you start the day with each other's voice.","Keep them safe. They'll become a treasured memory later."],
+    [5,"The playlist of the day","Share what you're listening to today, no explanation needed, just to share a piece of your day.","Build a shared playlist that keeps growing over time."],
+    [6,"The weather of the heart","Use a shared weather app to know what the weather is like where your partner is.","Comment on the weather as if you were side by side."],
+    [7,"The secret emoji","Pick an emoji that, just between you, means \"I'm thinking of you\" and send it out of the blue.","Change it from time to time to keep the spark alive."],
+    [8,"The mirror selfie","Take a selfie with the same expression every day for a week, then compare them at the end.","Try ridiculous expressions to make each other laugh."],
+    [9,"Today's gratitude","Share one thing you're grateful for today.","Write them all down. Together they'll form a lovely recap of your year."],
+    [10,"The shared meal","Send a photo of your meal so you can \"eat together\", even from afar.","Try cooking the same thing one night a week."],
+    [11,"The last word","Create a bedtime ritual with the same final words every time, like a quiet signal.","A simple \"see you tomorrow, my love\" is enough."],
+    [12,"Thought of the day","Send a quote or a thought that struck you today.","Keep them in a shared note. Over time it'll start to sound like the two of you."],
+    [13,"Noon here, noon there","Share a photo of wherever you are at noon.","Compare your surroundings, even if they're worlds apart."],
+    [14,"Our own sticker","Create a custom emoji or sticker that means \"I'm thinking of you\".","Use any simple sticker-making app."],
+    [15,"Compliment of the day","Send a different compliment every day for a whole month.","Note down the ones that touched you the most."],
+    [16,"Outfit of the day","Share a photo of your outfit, as if you were getting ready together in the morning.","Have fun commenting on the more questionable looks."],
+    [17,"The secret good morning","Create a morning ritual with the same phrase, said in your own special way, every time.","That phrase will become a powerful symbol of your relationship."],
+    [18,"The sung voice note","Send each other a sung voice note, even (especially) if you're off-key.","No judgment here. It's meant to make each other laugh and melt a little."]
+   ]},
+  {num:2,title:"Virtual dates",intro:"Distance doesn't stop you from having real moments together. These dates recreate closeness, one screen at a time.",
+   acts:[
+    [19,"Video-call dinner","Order the same meal on both ends and have dinner together over a video call.","Set the table like it's a real date."],
+    [20,"The synced movie","Watch a movie at the same time, with a video call running so you can share your reactions.","Count down \"3, 2, 1\" together before hitting play."],
+    [21,"The two-player game","Play an online board game together (chess, cards, co-op games).","Set up a small challenge or forfeit for whoever loses."],
+    [22,"Cooking on video call","Cook the same recipe at the same time, each in your own kitchen, on a video call.","Taste it at the same moment and compare your results."],
+    [23,"Sunday virtual coffee","Set up a standing video coffee date every Sunday morning, with no phone screens in between.","Make it a sacred ritual, one that's hard to cancel."],
+    [24,"The couple quiz","Host a video-call quiz to see who knows the other best.","Prepare questions ahead of time to catch each other off guard."],
+    [25,"Working out together","Do a workout together over video call: yoga, stretching, or cardio.","Pick a video to follow along with, together."],
+    [26,"Sunset for two","Watch a sunset together over a video call, in silence if you'd like.","Take a photo of the screen as a keepsake."],
+    [27,"The virtual museum","Take a virtual tour of a famous museum together, running commentary included.","Many major museums offer free virtual tours."],
+    [28,"Long-distance karaoke","Host a karaoke night over video call, without worrying about looking silly.","Each pick a song for the other."],
+    [29,"Draw me","On a video call, each draw a portrait of the other in just a few minutes.","Exchange photos of your masterpieces and keep them safe."],
+    [30,"The simultaneous show","Watch a TV episode \"at the same time\", each from your own home.","No skipping ahead without the other one!"],
+    [31,"The synced picnic","Prepare a little picnic on each side and share it over a video call.","Pick the same menu to really commit to the bit."],
+    [32,"The co-op video game","Play an online video game together, ideally a co-op one.","A simple game is enough. The shared time is what matters."],
+    [33,"Long-distance tasting","Send each other the same wine, tea, or chocolate in advance, and taste it together on a video call.","Note your impressions and compare your opinions."],
+    [34,"Dress-up night","Host a costume night over video call, just for the fun of laughing together.","Improvise with whatever you have on hand."],
+    [35,"Comfortable silence","Stay on a video call without talking, just to be present for each other.","Try it during your evening routine, as if you were side by side."],
+    [36,"Stargazing together","Watch the stars from wherever you each are, on a video call.","Look for the same constellation at the same time."],
+    [37,"The everyday tour","Give a video tour of your home or neighborhood so you can \"live\" each other's daily life.","Show the small details you never usually describe."],
+    [38,"Synced breakfast in bed","Have breakfast in bed together over a video call, without leaving bed all morning.","Extend it into a shared long-distance lazy morning."]
+   ]},
+  {num:3,title:"Letters and sweet words",intro:"Writing has a power that instant messages don't: it can be kept, reread, passed on. These words will become treasures.",
+   acts:[
+    [39,"The reunion letter","Write a letter to be opened only on the day you're reunited next.","Seal it. The wait will make the moment even stronger."],
+    [40,"The time capsule","Together, create a series of messages to open exactly one year from now.","Add a fun prediction about your future."],
+    [41,"Why I love you","Write a letter explaining why you love your partner, and send it as a surprise.","Be specific. Details touch people more than generalities."],
+    [42,"The shared journal","Keep a journal you take turns writing in and send to each other every week.","End each entry with a question to keep the conversation going."],
+    [43,"The emergency comfort message","Write a message to be opened only \"in case of a rough patch\".","Fill it with memories that make each other smile."],
+    [44,"The numbered letters","Create a set of letters to open \"when you feel lonely\", \"when you're doubting us\", and so on.","Hide them in your partner's belongings before you part ways."],
+    [45,"The physical postcard","Send a real postcard, even if you've already said it all by message.","The physical gesture matters more than the content."],
+    [46,"A poem for them","Write a poem or a song for your partner, even a clumsy one.","Sincerity matters more than a perfect rhyme."],
+    [47,"The sweet-words advent calendar","Create a calendar with one sweet note per day counting down to your next reunion.","Use small numbered envelopes."],
+    [48,"The letter from the future","Write a letter as if you were speaking to each other 10 years from now.","Keep it safe to reread together one day."],
+    [49,"The \"just in case\" message","Send a voice message \"just in case I forget to tell you today\".","Simply say what you're feeling, no filter."],
+    [50,"The notebook of little words","Create a notebook of sweet notes to mail back and forth to each other over time.","Add drawings or collages to make it your own."],
+    [51,"Top 10 favorite memories","Each write your 10 favorite memories together, then compare lists.","You'll be surprised which ones match."],
+    [52,"The handwritten letter","Write a letter by hand instead of typing it, for the gesture and the handwriting itself.","The time it took to write shows in the reading."],
+    [53,"The written treasure hunt","Create a long-distance scavenger hunt with clues sent one by one.","Lead it toward a memory, a photo, or a final surprise."],
+    [54,"The \"someday\" list","Write down what you'd like to do together \"once\" the distance is over.","Reread this list often to keep hope alive."],
+    [55,"What I love about you today","Send a message starting with \"what I love about you today is...\".","Try to say something different each time."],
+    [56,"Invented words","Create a list of made-up terms of endearment, a secret language just for the two of you.","Use them in your everyday messages."]
+   ]},
+  {num:4,title:"Long-distance gifts and surprises",intro:"An object, a parcel, a familiar scent: these gestures make tangible what words don't always manage to express.",
+   acts:[
+    [57,"The parcel that smells like home","Send a surprise parcel with items that smell like your home.","Add a note explaining each item."],
+    [58,"The twin candle","Order the same scented candle so you feel like you're in the same space when you light it together.","Light it during your next video call."],
+    [59,"The annotated book","Send a book with passages highlighted that remind you of your partner.","Add notes in the margins, like a silent conversation."],
+    [60,"Breakfast delivered","Have a surprise breakfast delivered to your partner's door, without warning.","Time it so they're properly awake to enjoy it."],
+    [61,"The scented piece of clothing","Send a t-shirt or sweater that carries your perfume or cologne.","A simple gesture with a surprisingly strong emotional impact."],
+    [62,"The surprise subscription","Set up a monthly surprise subscription (tea, chocolate, small trinkets).","Change the theme each month to keep the surprise alive."],
+    [63,"The annotated playlist","Send a \"just for you\" playlist with a note explaining each song.","Take the time to really justify each choice."],
+    [64,"Surprise flowers","Have flowers delivered out of nowhere, on an ordinary day.","The best surprises need no special occasion."],
+    [65,"The keepsake object","Send an object that represents a specific memory between you.","Include a note explaining why that object matters."],
+    [66,"The memory box","Create a memory box to mail back and forth, filling up over time.","Add ticket stubs, photos, and little notes with each mailing."],
+    [67,"The scented comfort object","Send a pillow or plush that carries the smell of your home.","Perfect for the nights when the distance weighs the most."],
+    [68,"Their favorite dish, delivered","Have your partner's favorite dish delivered, on an ordinary day, no occasion needed.","A surprise doesn't need an event to be beautiful."],
+    [69,"The recorded goodnight","Send a voice recording of yourself saying \"goodnight\", to listen to before falling asleep.","Record several so you have options for the harder nights."],
+    [70,"The photo calendar","Create a calendar with your photos together and give it to your partner.","Add one important date per month (when you met, your first trip...)."],
+    [71,"The gifted date","Send a gift card for \"a date on me\", to use however they like.","Let your partner choose the place and the activity."],
+    [72,"The hidden note","Hide a sweet little note inside one of your partner's everyday items.","Ask a friend nearby to help slip it in discreetly."]
+   ]},
+  {num:5,title:"Preparing your reunion",intro:"The wait feels lighter when you prepare for it. These activities turn the countdown into a shared project.",
+   acts:[
+    [73,"The visual countdown","Create a visual countdown to your next reunion.","Put it somewhere you'll see it every day."],
+    [74,"The first reunion meal","Plan together what you'll eat on the day you're reunited.","Pick a dish that holds special meaning for the two of you."],
+    [75,"The day-of list","Write a list of things to do the moment you're reunited.","Each keep a copy, and compare afterward."],
+    [76,"The reunion playlist","Create a playlist to listen to on your way to see each other.","Add songs that tell the story of your relationship."],
+    [77,"The arrival surprise","Prepare a surprise for your partner's arrival.","Even a small gesture can make this moment unforgettable."],
+    [78,"The weekend, planned in detail","Plan your first weekend back together in detail, together.","Still leave some room for spontaneity."],
+    [79,"The welcome ritual","Create a welcome ritual: the same gesture or phrase every time you arrive.","Over time, this ritual will become a precious anchor."],
+    [80,"Places to discover","Make a list of places to explore together on the next visit.","Mix well-known spots with hidden gems."],
+    [81,"The letter to read together","Prepare a letter to read aloud together the moment you're reunited.","Write it together, four-handed, if you can."],
+    [82,"The next trip","Plan a trip for your next chance to see each other.","Even a small budget can make for a lovely getaway."],
+    [83,"The visits calendar","Create a visible calendar of upcoming visits.","It makes future reunions feel more real."],
+    [84,"The day everything changes","Imagine and write down what the day the distance ends will look like.","Reread it whenever doubt creeps in."],
+    [85,"The special outfit","Prepare a special outfit or look for your reunion.","Keep it a secret until the big day."],
+    [86,"The reunion menu","Make a list of dishes to cook together on the next visit.","Plan the ingredients ahead so you don't waste any time."],
+    [87,"The never-before activity","Plan an activity you've never done together before.","Push a little past your shared comfort zone."],
+    [88,"The end-of-visit ritual","Create a ritual to soften your next goodbye.","A simple gesture can make parting a little easier."]
+   ]},
+  {num:6,title:"Deep connection",intro:"Beyond the activities, it's these honest conversations that truly nourish your bond, day after day.",
+   acts:[
+    [89,"The 36 questions","Ask each other the 36 questions that lead to closeness (the Aron method), over video call.","Take your time. Don't try to get through them all in one evening."],
+    [90,"The distance check-in","Talk openly about what's hard about the distance, once a month.","Make it a judgment-free moment, just to listen to each other."],
+    [91,"Our life in 5 years","Each write your own vision of your life together in 5 years, then compare.","Note the common ground and talk through the differences."],
+    [92,"The wildest dream","Tell each other your wildest dream for the future of your relationship.","Don't hold back, even if it sounds unrealistic."],
+    [93,"The monthly review","Do a monthly check-in: what's going well, what could be better.","Always end on a positive note."],
+    [94,"The end date","Talk openly about when the distance might end, even a rough estimate.","Having a horizon, even a blurry one, helps you hold on."],
+    [95,"What you're missing this week","Ask \"what do you miss most about me this week?\".","Asked regularly, this question reveals a lot."],
+    [96,"The shared fear","Share a fear or worry related to the distance, without judgment.","Receive your partner's answer gently."],
+    [97,"Our shared values","Together, create a list of values that matter to your relationship.","Come back to it whenever a big decision comes up."],
+    [98,"Sunday gratitude","Make it a Sunday ritual to thank each other for something specific.","Be precise about what you're grateful for."],
+    [99,"Coping with missing each other","Talk about how to cope when missing each other becomes too heavy.","Find a gesture together that helps in those moments."],
+    [100,"Why it's worth it","Remind each other why this distance is worth it.","Keep a written record of this conversation."],
+    [101,"The shared promise","Write each other a shared promise to hold onto until you're reunited.","Sign it together, even if just symbolically."]
+   ]}
+]};
+let SECTIONS = SECTIONS_ALL[lang];
 
-const QUESTIONS = [
+const QUESTIONS_ALL = { fr: [
   ["Pour se redécouvrir",[
     "Quel est ton souvenir préféré de nous, et pourquoi ?",
     "Qu'est-ce que tu as appris sur toi-même depuis qu'on est ensemble ?",
@@ -379,22 +815,98 @@ const QUESTIONS = [
     "Comment veux-tu qu'on organise notre quotidien une fois réunis ?",
     "Quel est ton rêve professionnel, et comment je peux te soutenir dedans ?"
   ]]
-];
+], en: [
+  ["To rediscover each other",[
+    "What's your favorite memory of us, and why?",
+    "What have you learned about yourself since we've been together?",
+    "What song reminds you of me, and since when?",
+    "If you had to describe our relationship in three words, what would they be?",
+    "What exactly made you fall in love with me?"
+  ]],
+  ["To talk about the distance",[
+    "What do you miss most about me right now?",
+    "How do you cope when the distance feels like too much?",
+    "What could I do to make you feel closer to me?",
+    "Was there a recent moment you felt lonely that you didn't tell me about?",
+    "What helps you get through the hard days?"
+  ]],
+  ["To dream together",[
+    "What does our life look like once the distance is over?",
+    "What's the first trip we should take together?",
+    "Where do you imagine us living, someday?",
+    "What tradition would you like us to create together?",
+    "If we could live anywhere for a year, where would we go?"
+  ]],
+  ["To go deeper",[
+    "What do you need from me that I'm not giving you yet?",
+    "How can I better support you during hard times?",
+    "What makes you feel loved on an ordinary day?",
+    "Is there something you've never dared to tell me?",
+    "What has the distance taught us about ourselves as a couple?"
+  ]],
+  ["To laugh a little",[
+    "What's the strangest thing you do when you think of me?",
+    "If I were an emoji, which one would I be?",
+    "What's the cutest (or most embarrassing) thing I've done without realizing it?",
+    "If we had a couple theme song, what would it be?",
+    "What would you do if I showed up at your place right now, out of nowhere?"
+  ]],
+  ["For trust",[
+    "What reassures you most when doubt creeps in?",
+    "How can I prove my faithfulness to you even from afar?",
+    "Is there something I do, even unintentionally, that makes you uncomfortable?",
+    "What strengthens your trust in us, day after day?",
+    "If you could change one thing about how we communicate, what would it be?"
+  ]],
+  ["For family and the future",[
+    "How do you imagine introducing our relationship to your family?",
+    "How many kids would you like to have, if any?",
+    "What family traditions would you like us to keep together?",
+    "What matters most to you in a future home?",
+    "How do you want us to celebrate our anniversaries later on?"
+  ]],
+  ["For money and practical life",[
+    "How do you see managing finances as a couple?",
+    "What matters to you in our future lifestyle?",
+    "Would you rather save for a trip or a house first?",
+    "How do you want us to organize our daily life once we're reunited?",
+    "What's your career dream, and how can I support you in it?"
+  ]]
+]};
+let QUESTIONS = QUESTIONS_ALL[lang];
 
 let state = {}; // key -> {checked, note}
 let activeTab = "s1";
 
 function starsBg(){
   const el = document.getElementById('stars');
+  const glyphs = ['💗','💛','✨','🤍'];
   let html = '';
-  for(let i=0;i<60;i++){
-    const size = Math.random()*2+1;
-    const top = Math.random()*100;
+  for(let i=0;i<34;i++){
+    const size = Math.random()*10+10;
     const left = Math.random()*100;
-    const delay = Math.random()*4;
-    html += `<div class="star" style="width:${size}px;height:${size}px;top:${top}%;left:${left}%;animation-delay:${delay}s;"></div>`;
+    const delay = Math.random()*14;
+    const duration = Math.random()*10+14;
+    const glyph = glyphs[Math.floor(Math.random()*glyphs.length)];
+    html += `<div class="star" style="font-size:${size}px;left:${left}%;bottom:-40px;animation-delay:${delay}s;animation-duration:${duration}s;">${glyph}</div>`;
   }
   el.innerHTML = html;
+}
+
+function spawnConfetti(){
+  const el = document.getElementById('confetti');
+  const glyphs = ['💗','💖','💞','🎉','💛'];
+  let html = '';
+  for(let i=0;i<50;i++){
+    const left = Math.random()*100;
+    const delay = Math.random()*1.2;
+    const duration = Math.random()*2+2.5;
+    const size = Math.random()*14+14;
+    const glyph = glyphs[Math.floor(Math.random()*glyphs.length)];
+    html += `<div class="confetti-heart" style="left:${left}%;font-size:${size}px;animation-delay:${delay}s;animation-duration:${duration}s;">${glyph}</div>`;
+  }
+  el.innerHTML = html;
+  setTimeout(()=>{ el.innerHTML=''; }, 5000);
 }
 
 function checkIcon(){
@@ -405,47 +917,230 @@ function normalizeCode(raw){
   return raw.trim().toUpperCase().replace(/\s+/g,'');
 }
 
+function showGateMode(mode){
+  document.getElementById('gtLogin').classList.toggle('active', mode==='login');
+  document.getElementById('gtSub').classList.toggle('active', mode==='subscribe');
+  document.getElementById('gateLogin').classList.toggle('hidden', mode!=='login');
+  document.getElementById('gateSubscribe').classList.toggle('hidden', mode!=='subscribe');
+}
+window.showGateMode = showGateMode;
+
+async function startSubscription(){
+  const name = (document.getElementById('subYourName').value||'').trim();
+  const email = (document.getElementById('subEmail').value||'').trim();
+  const partnerName = (document.getElementById('subPartnerName').value||'').trim();
+  const partnerEmail = (document.getElementById('subPartnerEmail').value||'').trim();
+  const errorEl = document.getElementById('subError');
+  const btn = document.getElementById('subBtn');
+  errorEl.textContent = '';
+  if(!name || !partnerName){
+    errorEl.textContent = tr('subErrorNames');
+    return;
+  }
+  if(!email || !email.includes('@')){
+    errorEl.textContent = tr('subErrorEmail');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = tr('subBtnLoading');
+  try{
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({name, email, partnerName, partnerEmail})
+    });
+    const data = await res.json();
+    if(!res.ok || !data.url){
+      throw new Error(data.error || 'Unknown error');
+    }
+    window.location.href = data.url;
+  }catch(e){
+    console.error(e);
+    errorEl.textContent = tr('subErrorGeneric');
+    btn.disabled = false;
+    btn.textContent = tr('subBtn');
+  }
+}
+window.startSubscription = startSubscription;
+
+function showGateBanner(){
+  const params = new URLSearchParams(window.location.search);
+  const el = document.getElementById('gateBanner');
+  if(params.get('subscribed') === '1'){
+    el.innerHTML = `<div class="gate-banner">${tr('bannerSubscribed1')}</div>`;
+  } else if(params.get('subscribed') === '0'){
+    el.innerHTML = `<div class="gate-banner">${tr('bannerSubscribed0')}</div>`;
+    showGateMode('subscribe');
+  }
+}
+
+function chooseRoleUI(nameA, nameB){
+  return new Promise(resolve=>{
+    const overlay = document.createElement('div');
+    overlay.id = 'roleChooser';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:26;display:flex;align-items:center;justify-content:center;background:rgba(28,8,16,.9);padding:20px;';
+    overlay.innerHTML = `
+      <div style="max-width:360px;width:100%;background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:28px 24px;text-align:center;">
+        <p style="font-family:var(--serif);color:var(--gold-soft);font-size:19px;margin:0 0 18px;">${tr('whoAreYouTitle')}</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button id="roleBtnA" class="gate-btn" type="button">${nameA}</button>
+          <button id="roleBtnB" class="gate-btn" type="button">${nameB}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#roleBtnA').addEventListener('click', ()=>{ overlay.remove(); resolve('A'); });
+    overlay.querySelector('#roleBtnB').addEventListener('click', ()=>{ overlay.remove(); resolve('B'); });
+  });
+}
+
+async function identifyRole(data){
+  partners = data.partners || {};
+  const roleKey = `couple_role_${coupleCode}`;
+  const savedRole = localStorage.getItem(roleKey);
+  if(savedRole && partners[savedRole]){
+    myRole = savedRole;
+    return;
+  }
+  const ref = doc(db, 'couples', coupleCode);
+  if(!partners.A){
+    const name = (window.prompt(tr('promptFirstName')) || tr('defaultName')).trim().slice(0,30);
+    partners.A = {name, emoji:'', label:'', updatedAt: Date.now()};
+    myRole = 'A';
+    localStorage.setItem(roleKey, 'A');
+    await setDoc(ref, {partners}, {merge:true});
+  } else if(!partners.B){
+    const name = (window.prompt(tr('promptSecondName', {name: partners.A.name})) || tr('defaultName')).trim().slice(0,30);
+    partners.B = {name, emoji:'', label:'', updatedAt: Date.now()};
+    myRole = 'B';
+    localStorage.setItem(roleKey, 'B');
+    await setDoc(ref, {partners}, {merge:true});
+  } else {
+    myRole = await chooseRoleUI(partners.A.name, partners.B.name);
+    localStorage.setItem(roleKey, myRole);
+  }
+}
+
+function attachRealtimeSync(){
+  if(unsubscribeSnapshot) unsubscribeSnapshot();
+  const ref = doc(db, 'couples', coupleCode);
+  unsubscribeSnapshot = onSnapshot(ref, (snap)=>{
+    if(!snap.exists()) return;
+    const data = snap.data();
+    partners = data.partners || partners;
+    const active = document.activeElement;
+    const typing = active && active.tagName === 'TEXTAREA';
+    if(!typing){
+      state = data.state || state;
+    }
+    updateProgress();
+    renderMoodBar();
+    if(activeTab === 'rewards' || !typing) render();
+  });
+}
+
 async function submitCode(){
   const input = document.getElementById('gateInput');
   const errorEl = document.getElementById('gateError');
   const code = normalizeCode(input.value || '');
   if(!code){
-    errorEl.textContent = "Merci d'entrer votre code.";
+    errorEl.textContent = tr('gateErrorEmpty');
     return;
   }
   errorEl.textContent = '';
   errorEl.className = 'gate-loading';
-  errorEl.textContent = 'Chargement de votre espace...';
+  errorEl.textContent = tr('gateLoading');
   try{
     coupleCode = code;
     const ref = doc(db, 'couples', coupleCode);
     const snap = await getDoc(ref);
-    if(snap.exists()){
-      state = snap.data().state || {};
-    } else {
-      state = {};
-      await setDoc(ref, {state: {}, createdAt: Date.now()});
+    if(!snap.exists()){
+      errorEl.className = 'gate-error';
+      errorEl.textContent = tr('gateErrorNotFound');
+      return;
     }
+    const data = snap.data();
+    if(data.subscription && data.subscription.status === 'canceled'){
+      errorEl.className = 'gate-error';
+      errorEl.textContent = tr('gateErrorCanceled');
+      showGateMode('subscribe');
+      return;
+    }
+    state = data.state || {};
+    await identifyRole(data);
     localStorage.setItem('couple_code', coupleCode);
     document.getElementById('gate').classList.add('hidden');
     document.getElementById('app-content').classList.add('visible');
+    attachRealtimeSync();
     updateProgress();
+    renderMoodBar();
     render();
   }catch(e){
     console.error(e);
     errorEl.className = 'gate-error';
-    errorEl.textContent = "Une erreur est survenue. Vérifiez votre connexion et réessayez.";
+    errorEl.textContent = tr('gateErrorGeneric');
   }
 }
 window.submitCode = submitCode;
 
 async function loadState(){
+  showGateBanner();
   const saved = localStorage.getItem('couple_code');
   if(saved){
     document.getElementById('gateInput').value = saved;
     await submitCode();
   }
   // otherwise, gate stays visible waiting for user input
+}
+
+function setMyMood(emoji, label){
+  if(!myRole) return;
+  const cur = partners[myRole] || {name:'Moi'};
+  cur.emoji = emoji;
+  cur.label = label;
+  cur.updatedAt = Date.now();
+  partners[myRole] = cur;
+  renderMoodBar();
+  const ref = doc(db, 'couples', coupleCode);
+  setDoc(ref, {partners}, {merge:true}).catch(e=>console.error('mood save failed', e));
+}
+window.setMyMood = setMyMood;
+
+function timeAgo(ts){
+  if(!ts) return '';
+  const diff = Math.max(0, Date.now() - ts);
+  const min = Math.round(diff/60000);
+  if(min < 1) return tr('timeJustNow');
+  if(min < 60) return tr('timeMinAgo', {n:min});
+  const h = Math.round(min/60);
+  if(h < 24) return tr('timeHAgo', {n:h});
+  return tr('timeDAgo', {n:Math.round(h/24)});
+}
+
+function renderMoodBar(){
+  const el = document.getElementById('moodBar');
+  if(!el || !myRole) return;
+  const otherRole = myRole === 'A' ? 'B' : 'A';
+  const me = partners[myRole] || {};
+  const other = partners[otherRole];
+  let picker = '';
+  MOODS.forEach(m=>{
+    picker += `<button class="mood-btn ${me.emoji===m.e?'active':''}" title="${m.l}" onclick="setMyMood('${m.e}', this.title)">${m.e}</button>`;
+  });
+  const otherHtml = other
+    ? `<div class="mood-display">${other.emoji || '💗'}</div><span class="mood-display-label">${other.emoji ? other.label : tr('moodNotSet')}${other.updatedAt?' · '+timeAgo(other.updatedAt):''}</span>`
+    : `<div class="mood-empty">${tr('moodWaiting')}</div>`;
+  el.innerHTML = `
+    <div class="mood-widget">
+      <div class="mood-side">
+        <span class="mood-label">${tr('moodYours')}</span>
+        <div class="mood-picker">${picker}</div>
+      </div>
+      <div class="mood-divider">💗</div>
+      <div class="mood-side">
+        <span class="mood-label">${tr('moodOf')} <span class="mood-name">${other ? other.name : tr('moodUnknown')}</span></span>
+        ${otherHtml}
+      </div>
+    </div>`;
 }
 
 let saveTimer = null;
@@ -462,8 +1157,9 @@ function saveKey(key, value){
   }, 600);
 }
 
-function flashSaved(){
+function flashSaved(key){
   const n = document.getElementById('saveNote');
+  n.textContent = tr(key || 'savedLabel');
   n.classList.add('show');
   clearTimeout(window._saveT);
   window._saveT = setTimeout(()=>n.classList.remove('show'), 1200);
@@ -476,7 +1172,63 @@ function toggleActivity(num){
   saveKey(key, cur);
   updateProgress();
   render();
+  checkAndRevealRewards();
 }
+
+function isSectionComplete(sectionNum){
+  const s = SECTIONS.find(sec=>sec.num===sectionNum);
+  return s.acts.every(a => state[`activity:${a[0]}`] && state[`activity:${a[0]}`].checked);
+}
+
+function isAllComplete(){
+  for(let i=1;i<=101;i++){
+    if(!(state[`activity:${i}`] && state[`activity:${i}`].checked)) return false;
+  }
+  return true;
+}
+
+function checkAndRevealRewards(){
+  for(const s of SECTIONS){
+    const seenKey = `rewardSeen:${s.num}`;
+    if(isSectionComplete(s.num) && !(state[seenKey] && state[seenKey].seen)){
+      saveKey(seenKey, {seen:true});
+      showRewardModal(REWARDS[s.num], false);
+      return;
+    }
+  }
+  const finaleKey = 'rewardSeen:finale';
+  if(isAllComplete() && !(state[finaleKey] && state[finaleKey].seen)){
+    saveKey(finaleKey, {seen:true});
+    showRewardModal(FINALE_REWARD, true);
+  }
+}
+
+function showRewardModal(reward, isFinale){
+  const modal = document.getElementById('rewardModal');
+  const box = document.getElementById('rewardModalBox');
+  box.innerHTML = `
+    <div class="big-emoji">${isFinale ? '🎉' : '🎁'}</div>
+    <h3>${isFinale ? tr('modalTitleFinale') : tr('modalTitleSection')}</h3>
+    <p>${isFinale ? tr('modalBodyFinale') : tr('modalBodySectionTemplate', {type: reward.type.toLowerCase()})}</p>
+    <button class="reward-modal-close" onclick="closeRewardModal()">${tr('modalClose')}</button>
+  `;
+  modal.classList.remove('hidden');
+  if(isFinale) spawnConfetti();
+}
+
+function closeRewardModal(){
+  document.getElementById('rewardModal').classList.add('hidden');
+  setTab('rewards');
+}
+window.closeRewardModal = closeRewardModal;
+
+function copyRewardText(sectionNum){
+  const text = REWARDS[sectionNum].body;
+  navigator.clipboard.writeText(text).then(()=>{
+    flashSaved('copiedLabel');
+  }).catch(()=>{});
+}
+window.copyRewardText = copyRewardText;
 
 function updateNote(key, val){
   const cur = state[key] || {checked:false, note:''};
@@ -490,7 +1242,7 @@ function updateProgress(){
     if(state[`activity:${i}`] && state[`activity:${i}`].checked) done++;
   }
   const pct = Math.round(done/101*100);
-  document.getElementById('prog-text').textContent = `${done} / 101 réalisées`;
+  document.getElementById('prog-text').textContent = tr('progressText', {done});
   document.getElementById('prog-pct').textContent = `${pct}%`;
   document.getElementById('prog-fill').style.width = `${pct}%`;
 }
@@ -501,7 +1253,8 @@ function renderTabs(){
   SECTIONS.forEach(s=>{
     html += `<button class="tab ${activeTab==='s'+s.num?'active':''}" onclick="setTab('s${s.num}')">${s.num}. ${s.title}</button>`;
   });
-  html += `<button class="tab ${activeTab==='questions'?'active':''}" onclick="setTab('questions')">Questions de couple</button>`;
+  html += `<button class="tab ${activeTab==='questions'?'active':''}" onclick="setTab('questions')">${tr('tabQuestions')}</button>`;
+  html += `<button class="tab ${activeTab==='rewards'?'active':''}" onclick="setTab('rewards')">${tr('tabRewards')}</button>`;
   tabs.innerHTML = html;
 }
 
@@ -518,10 +1271,10 @@ function activityCard(num, title, desc, tip){
       <div class="card-top">
         <div class="checkbox ${st.checked?'checked':''}" onclick="toggleActivity(${num})">${checkIcon()}</div>
         <div class="card-body">
-          <p class="card-title ${st.checked?'done':''}"><span class="num">#${num}</span>${title}</p>
+          <p class="card-title ${st.checked?'done':''}"><span class="num">♥${num}</span>${title}</p>
           <p class="card-desc">${desc}</p>
-          <p class="card-tip"><b>Astuce —</b> ${tip}</p>
-          <textarea class="note-input" placeholder="Notre note sur ce moment (optionnel)..." onchange="updateNote('${key}', this.value)">${st.note||''}</textarea>
+          <p class="card-tip">${tip}</p>
+          <textarea class="note-input" placeholder="${tr('notePlaceholder')}" onchange="updateNote('${key}', this.value)">${st.note||''}</textarea>
         </div>
       </div>
     </div>`;
@@ -532,8 +1285,8 @@ function questionCard(themeIdx, qIdx, text){
   const st = state[key] || {note:''};
   return `
     <div class="q-card">
-      <p class="q-text">— ${text}</p>
-      <textarea class="note-input" placeholder="Vos réponses..." onchange="updateNote('${key}', this.value)">${st.note||''}</textarea>
+      <p class="q-text">${text}</p>
+      <textarea class="note-input" placeholder="${tr('questionsPlaceholder')}" onchange="updateNote('${key}', this.value)">${st.note||''}</textarea>
     </div>`;
 }
 
@@ -542,8 +1295,8 @@ function render(){
   const panels = document.getElementById('panels');
   if(activeTab === 'questions'){
     let html = `<section class="panel active">
-      <div class="section-head"><div class="num">Bonus</div><h2>Questions de couple</h2></div>
-      <p class="section-intro">À utiliser lors de vos appels, dîners virtuels, ou juste comme ça, un soir de manque.</p>`;
+      <div class="section-head"><div class="num">${tr('bonusLabel')}</div><h2>${tr('tabQuestions')}</h2></div>
+      <p class="section-intro">${tr('questionsIntro')}</p>`;
     QUESTIONS.forEach((theme, tIdx)=>{
       html += `<div class="q-theme">${theme[0]}</div>`;
       theme[1].forEach((q, qIdx)=>{
@@ -552,10 +1305,51 @@ function render(){
     });
     html += `</section>`;
     panels.innerHTML = html;
+  } else if(activeTab === 'rewards'){
+    let html = `<section class="panel active">
+      <div class="section-head"><div class="num">${tr('bonusLabel')}</div><h2>${tr('rewardsHeading')}</h2></div>
+      <p class="section-intro">${tr('rewardsIntro')}</p>`;
+    SECTIONS.forEach(s=>{
+      const unlocked = isSectionComplete(s.num);
+      const r = REWARDS[s.num];
+      if(unlocked){
+        html += `<div class="reward-card unlocked">
+          <div class="reward-kicker">${r.type} · ${tr('sectionLabel')} ${s.num}</div>
+          <p class="reward-title">${r.title}</p>
+          <p class="reward-body">${r.body}</p>
+          ${r.copyable ? `<button class="reward-copy-btn" onclick="copyRewardText(${s.num})">${tr('rewardCopyBtn')}</button>` : ''}
+        </div>`;
+      } else {
+        html += `<div class="reward-card">
+          <div class="reward-locked">${tr('rewardLockedTemplate', {title: s.title})}</div>
+        </div>`;
+      }
+    });
+    const finaleUnlocked = isAllComplete();
+    if(finaleUnlocked){
+      const nameA = partners.A ? partners.A.name : '...';
+      const nameB = partners.B ? partners.B.name : '...';
+      html += `<div class="reward-card finale unlocked">
+        <div class="reward-kicker">${FINALE_REWARD.type}</div>
+        <p class="reward-title">${FINALE_REWARD.title}</p>
+        <p class="reward-body">${FINALE_REWARD.body}</p>
+        <div class="certificate">
+          <div class="reward-kicker">${tr('certificateKicker')}</div>
+          <div class="names">${nameA} &amp; ${nameB}</div>
+          <div class="date">${tr('certificateSubtitle')}</div>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="reward-card finale">
+        <div class="reward-locked">${tr('rewardFinaleLocked')}</div>
+      </div>`;
+    }
+    html += `</section>`;
+    panels.innerHTML = html;
   } else {
     const s = SECTIONS.find(sec => 's'+sec.num === activeTab);
     let html = `<section class="panel active">
-      <div class="section-head"><div class="num">Section ${s.num}</div><h2>${s.title}</h2></div>
+      <div class="section-head"><div class="num">${tr('sectionLabel')} ${s.num}</div><h2>${s.title}</h2></div>
       <p class="section-intro">${s.intro}</p>`;
     s.acts.forEach(a=>{
       html += activityCard(a[0], a[1], a[2], a[3]);
@@ -569,6 +1363,7 @@ window.setTab = setTab;
 window.toggleActivity = toggleActivity;
 window.updateNote = updateNote;
 
+applyStaticTranslations();
 starsBg();
 updateProgress();
 loadState();
