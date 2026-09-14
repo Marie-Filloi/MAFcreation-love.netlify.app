@@ -1,7 +1,3 @@
-const Stripe = require('stripe');
-
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Méthode non autorisée.' });
@@ -23,21 +19,31 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      customer_email: email,
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-      success_url: `${process.env.APP_BASE_URL}/?subscribed=1`,
-      cancel_url: `${process.env.APP_BASE_URL}/?subscribed=0`,
-      metadata: {
-        name: name.trim().slice(0, 60),
-        partnerName: partnerName.trim().slice(0, 60),
-        partnerEmail: (partnerEmail || '').toString().slice(0, 200)
-      }
+    const paystackRes = await fetch('https://api.paystack.co/transaction/initialize', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        plan: process.env.PAYSTACK_PLAN_CODE,
+        callback_url: `${process.env.APP_BASE_URL}/?subscribed=1`,
+        metadata: {
+          name: name.trim().slice(0, 60),
+          partnerName: partnerName.trim().slice(0, 60),
+          partnerEmail: partnerEmail.trim().toLowerCase().slice(0, 200)
+        }
+      })
     });
 
-    res.status(200).json({ url: session.url });
+    const data = await paystackRes.json();
+    if (!data.status || !data.data || !data.data.authorization_url) {
+      console.error('Paystack init error', data);
+      throw new Error(data.message || 'Paystack error');
+    }
+
+    res.status(200).json({ url: data.data.authorization_url });
   } catch (err) {
     console.error('create-checkout-session error', err);
     res.status(500).json({ error: 'Impossible de créer la session de paiement.' });

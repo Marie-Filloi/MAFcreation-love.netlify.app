@@ -1,7 +1,7 @@
 # Mise en place — Malgré la distance
 
 Le site est un fichier statique (`index.html`) + des fonctions serveur dans `/api`
-(paiement Stripe, webhook, envoi du lien de connexion). Ces instructions supposent un
+(paiement Paystack, webhook, envoi du lien de connexion). Ces instructions supposent un
 déploiement sur **Vercel** (comme votre URL actuelle `...vercel.app`). Si vous déployez
 finalement sur Netlify, dites-le moi : les fonctions doivent être réécrites au format
 Netlify Functions.
@@ -11,18 +11,26 @@ adresse email (lien de connexion sans mot de passe, comme "Se connecter avec Sla
 email). C'est plus sûr contre le partage/l'infidélité qu'un code, qui pouvait être transmis
 à n'importe qui.
 
-## 1. Stripe (paiement + abonnement)
+## 1. Paystack (paiement + abonnement)
 
-1. Créez un compte sur https://dashboard.stripe.com si ce n'est pas déjà fait.
-2. Allez dans **Produits** → créez un produit "Malgré la distance", avec un prix **récurrent**
-   (mensuel). Notez l'ID du prix (`price_...`).
-3. Allez dans **Développeurs → Clés API** → copiez la clé secrète (`sk_test_...` en mode test,
-   `sk_live_...` en production).
-4. Une fois le site déployé, allez dans **Développeurs → Webhooks** → "Ajouter un endpoint" :
-   - URL : `https://votresite.vercel.app/api/stripe-webhook`
-   - Événements à écouter : `checkout.session.completed`, `customer.subscription.updated`,
-     `customer.subscription.deleted`
-   - Copiez le "Signing secret" (`whsec_...`).
+Stripe n'accepte pas les comptes marchands basés en Afrique du Sud : on utilise donc
+Paystack (racheté par Stripe, conçu pour les marchés africains), qui supporte les paiements
+récurrents et les cartes locales et internationales.
+
+1. Créez un compte sur https://dashboard.paystack.com/#/signup.
+2. Complétez la vérification de votre entreprise (Paystack peut le demander avant d'activer
+   les paiements réels ; le mode test fonctionne immédiatement sans vérification).
+3. Allez dans **Plans** (menu de gauche) → "Create Plan" :
+   - Nom : "Malgré la distance"
+   - Montant : votre tarif mensuel, en ZAR (ou la devise de votre choix)
+   - Intervalle de facturation : **Monthly**
+   - Enregistrez, puis copiez le code du plan (`PLN_...`).
+4. Allez dans **Settings → API Keys & Webhooks** → copiez la **Secret Key** (`sk_test_...`
+   en mode test, `sk_live_...` en production).
+5. Toujours sur cette page, dans le champ **Webhook URL**, entrez :
+   `https://votresite.vercel.app/api/paystack-webhook`
+   Paystack enverra automatiquement les événements pertinents (dont `charge.success`) à
+   cette adresse — pas besoin de sélectionner des événements un par un comme sur Stripe.
 
 ## 2. Resend (envoi des emails)
 
@@ -64,9 +72,8 @@ Le projet Firebase existe déjà côté client (`mafcreation-love`). Deux choses
 Dans le tableau de bord Vercel du projet → **Settings → Environment Variables**, ajoutez
 toutes les variables listées dans `.env.example` (avec vos vraies valeurs) :
 
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PRICE_ID`
-- `STRIPE_WEBHOOK_SECRET`
+- `PAYSTACK_SECRET_KEY`
+- `PAYSTACK_PLAN_CODE`
 - `RESEND_API_KEY`
 - `EMAIL_FROM`
 - `FIREBASE_SERVICE_ACCOUNT_JSON`
@@ -78,8 +85,8 @@ Puis redéployez.
 
 1. Ouvrez le site, cliquez sur "Je n'ai pas de compte", entrez votre prénom, votre email, le
    prénom et l'email de votre partenaire (les deux emails sont obligatoires), puis payez avec
-   une carte de test Stripe (`4242 4242 4242 4242`, n'importe quelle date future, n'importe
-   quel CVC).
+   une carte de test Paystack (`4084 0840 8408 4081`, n'importe quelle date future, CVC `408`,
+   OTP `123456` si demandé — cartes de test à jour sur https://paystack.com/docs/payments/test-payments/).
 2. Les deux adresses reçoivent un email de bienvenue en quelques secondes.
 3. Revenez sur le site (mode "Se connecter" par défaut), entrez l'un des deux emails :
    vous recevez un lien de connexion personnel.
@@ -92,8 +99,14 @@ Puis redéployez.
 
 ## Ce qui n'est pas couvert
 
-- Pas de gestion d'annulation d'abonnement depuis le site (le client doit gérer/annuler depuis
-  le portail client Stripe ou vous demander de le faire depuis le dashboard Stripe).
+- Pas de gestion d'annulation d'abonnement depuis le site (à faire depuis le dashboard
+  Paystack, ou en construisant plus tard un lien vers leur portail client si Paystack en
+  propose un dans votre région).
+- Les noms exacts de certains champs dans les webhooks Paystack (`charge.success`,
+  `subscription.disable`) peuvent varier légèrement selon leur documentation à jour : la
+  première fois que vous testerez un vrai paiement, regardez le contenu du webhook reçu dans
+  Paystack Dashboard → Settings → API Keys & Webhooks → onglet des logs, pour confirmer que
+  les champs lus par `api/paystack-webhook.js` correspondent bien. Je pourrai ajuster si besoin.
 - L'email du lien de connexion vient de votre domaine Resend configuré, mais Firebase
   Authentication lui-même n'envoie aucun email dans ce montage (on génère le lien côté
   serveur et on l'envoie nous-mêmes via Resend, pour garder un email à votre image) : assurez-
